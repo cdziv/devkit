@@ -31,18 +31,5 @@
     "verdaccio": "^6.0.5",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
-  },
-  "nx": {
-    "includedScripts": [],
-    "targets": {
-      "local-registry": {
-        "executor": "@nx/js:verdaccio",
-        "options": {
-          "port": 4873,
-          "config": ".verdaccio/config.yml",
-          "storage": "tmp/local-registry/storage"
-        }
-      }
-    }
   }
 }

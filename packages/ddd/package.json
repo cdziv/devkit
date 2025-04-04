@@ -2,9 +2,7 @@
   "name": "@cdziv/devkit-ddd",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
@@ -16,6 +14,7 @@
     }
   },
   "dependencies": {
+    "@cdziv/devkit-error": "0.0.1",
     "tslib": "^2.3.0"
   }
 }

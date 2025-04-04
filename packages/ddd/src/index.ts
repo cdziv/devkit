@@ -1,1 +1,1 @@
-export * from './lib/devkit-ddd.js';
+export * from './lib/common/error';

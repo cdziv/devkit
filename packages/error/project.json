@@ -1,0 +1,26 @@
+{
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "main": "packages/error/src/index.ts",
+        "outputPath": "packages/error/dist",
+        "outputFileName": "index.js",
+        "tsConfig": "packages/error/tsconfig.lib.json",
+        "platform": "node",
+        "declarationRootDir": "packages/error/src",
+        "bundle": true
+      },
+      "configurations": {
+        "development": {
+          "minify": false
+        },
+        "production": {
+          "minify": true
+        }
+      }
+    }
+  }
+}

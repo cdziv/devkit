@@ -1,13 +1,10 @@
 {
-  "name": "@cdziv/devkit-error",
-  "version": "0.1.0",
+  "name": "@cdziv/devkit",
+  "version": "0.0.1",
+  "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
-  "author": "cdziv",
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -20,5 +17,8 @@
   "files": [
     "dist",
     "!**/*.tsbuildinfo"
-  ]
+  ],
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
 }

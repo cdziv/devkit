@@ -38,7 +38,4 @@ describe('createErrorCodes', () => {
       ERROR_2: 'MODULE.ERROR_2',
     });
   });
-  it('fail', () => {
-    expect(1).toBe(2);
-  });
 });

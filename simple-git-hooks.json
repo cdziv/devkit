@@ -1,0 +1,4 @@
+{
+  "pre-commit": "npx nx affected:lint --fix && npx nx format:write",
+  "pre-push": "npx nx affected:test"
+}

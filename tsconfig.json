@@ -5,12 +5,6 @@
   "references": [
     {
       "path": "./packages/error"
-    },
-    {
-      "path": "./packages/devkit"
-    },
-    {
-      "path": "./packages/pri"
     }
   ]
 }

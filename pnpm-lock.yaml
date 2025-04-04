@@ -81,7 +81,13 @@ importers:
         specifier: ^3.0.0
         version: 3.1.1(@types/node@18.16.9)(@vitest/ui@3.1.1)(jiti@2.4.2)(yaml@2.7.1)
 
-  packages/devkit:
+  packages/ddd:
+    dependencies:
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
+  packages/error:
     dependencies:
       tslib:
         specifier: ^2.3.0

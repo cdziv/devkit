@@ -19,12 +19,6 @@ jobs:
           # Fetch all branches and commits for Nx affected
           fetch-depth: 0
 
-      # Mark git directory so that Nx can run
-      - name: Set Directory as Safe
-        run: |
-          git config --system --add safe.directory "$GITHUB_WORKSPACE"
-        shell: bash
-
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
 

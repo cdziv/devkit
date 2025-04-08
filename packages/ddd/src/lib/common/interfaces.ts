@@ -5,13 +5,15 @@ export type JSONValue =
   | number
   | boolean
   | null
-  | Date
   | JSONArray
   | JSONObject;
 export interface JSONObject {
   [key: string]: JSONValue;
 }
 export type JSONArray = JSONValue[];
+export interface Serializable<T extends JSONValue> {
+  toJSON(): T;
+}
 
 export type DeepReadonly<T> = {
   readonly [K in keyof T]: DeepReadonly<T[K]>;
@@ -22,3 +24,14 @@ export type DomainPrimitive = string | number | boolean | null | Date;
 export type DomainPrimitiveObject = {
   [key in string]: DomainPrimitive | DomainPrimitive[] | DomainPrimitiveObject;
 };
+export type DeepJSON<T> = T extends Date
+  ? string
+  : T extends JSONValue
+  ? T
+  : T extends Serializable<infer U>
+  ? U
+  : T extends Record<string, unknown>
+  ? { [K in keyof T]: DeepJSON<T[K]> }
+  : T extends Array<infer U>
+  ? DeepJSON<U>[]
+  : never;

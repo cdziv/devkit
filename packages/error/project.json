@@ -6,12 +6,14 @@
       "defaultConfiguration": "production",
       "options": {
         "main": "packages/error/src/index.ts",
+        "format": ["cjs"],
         "outputPath": "packages/error/dist",
-        "outputFileName": "index.js",
+        "outputFileName": "index.cjs",
         "tsConfig": "packages/error/tsconfig.lib.json",
         "platform": "node",
         "declarationRootDir": "packages/error/src",
-        "bundle": true
+        "sourcemap": false,
+        "target": "node18"
       },
       "configurations": {
         "development": {

@@ -33,6 +33,7 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
+    "@cdziv/devkit-error": "0.1.4",
     "type-fest": "^4.40.0"
   }
 }

@@ -1,37 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-export type JSONValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JSONArray
-  | JSONObject;
-export interface JSONObject {
-  [key: string]: JSONValue;
-}
-export type JSONArray = JSONValue[];
-export interface Serializable<T extends JSONValue> {
-  toJSON(): T;
-}
-
-export type DeepReadonly<T> = {
-  readonly [K in keyof T]: DeepReadonly<T[K]>;
+export type Primitive = string | number | boolean | null | undefined;
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonObject = { [K in string]: JsonValue } & {
+  [K in string]?: JsonValue | undefined;
 };
-export type Constructor<T> = new (...args: any[]) => T;
+export type JsonArray = JsonValue[] | readonly JsonValue[];
+export type JsonValue = JsonPrimitive | JsonArray | JsonObject;
 
 export type DomainPrimitive = string | number | boolean | null | Date;
 export type DomainPrimitiveObject = {
   [key in string]: DomainPrimitive | DomainPrimitive[] | DomainPrimitiveObject;
 };
-export type DeepJSON<T> = T extends Date
+
+export interface Jsonifiable<T extends JsonValue> {
+  toJSON(): T;
+}
+export type JsonifyDeep<T> = T extends Date
   ? string
-  : T extends JSONValue
+  : T extends JsonValue
   ? T
-  : T extends Serializable<infer U>
+  : T extends bigint | symbol | Map<unknown, unknown> | Set<unknown>
+  ? object
+  : T extends Jsonifiable<infer U>
   ? U
   : T extends Record<string, unknown>
-  ? { [K in keyof T]: DeepJSON<T[K]> }
+  ? { [K in keyof T]: JsonifyDeep<T[K]> }
   : T extends Array<infer U>
-  ? DeepJSON<U>[]
+  ? JsonifyDeep<U>[]
   : never;

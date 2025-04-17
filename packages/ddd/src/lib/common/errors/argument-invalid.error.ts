@@ -5,7 +5,7 @@ export class ArgumentInvalidError extends DddError {
   readonly code = DDD_ERROR_CODES['argument-invalid'];
   readonly name = DDD_ERROR_CODES['argument-invalid'];
 
-  constructor(message: string) {
+  constructor(message = 'Argument is invalid') {
     super(message);
 
     Error.captureStackTrace(this, ArgumentInvalidError);

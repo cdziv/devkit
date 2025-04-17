@@ -1,20 +1,25 @@
 {
   "name": "@cdziv/devkit-ddd",
   "version": "0.0.1",
-  "private": true,
-  "main": "./dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     }
   },
   "dependencies": {
-    "@cdziv/devkit-error": "0.1.1",
-    "tslib": "^2.3.0"
+    "immutable": "^5.1.1",
+    "type-fest": "^4.40.0"
+  },
+  "devDependencies": {
+    "@cdziv/devkit-error": "workspace:*"
   }
 }

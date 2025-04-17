@@ -1,0 +1,32 @@
+{
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "main": "packages/ddd/src/index.ts",
+        "format": ["cjs"],
+        "outputPath": "packages/ddd/dist",
+        "outputFileName": "index.cjs",
+        "tsConfig": "packages/ddd/tsconfig.lib.json",
+        "platform": "node",
+        "declarationRootDir": "packages/ddd/src",
+        "sourcemap": false,
+        "target": "node18",
+        "bundle": true,
+        "esbuildOptions": {
+          "packages": "external"
+        }
+      },
+      "configurations": {
+        "development": {
+          "minify": false
+        },
+        "production": {
+          "minify": true
+        }
+      }
+    }
+  }
+}

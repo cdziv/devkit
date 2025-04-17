@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      type-fest:
+        specifier: ^4.40.0
+        version: 4.40.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.8.0
@@ -83,12 +87,16 @@ importers:
 
   packages/ddd:
     dependencies:
-      '@cdziv/devkit-error':
-        specifier: 0.1.1
-        version: 0.1.1
+      immutable:
+        specifier: ^5.1.1
+        version: 5.1.1
       tslib:
         specifier: ^2.3.0
         version: 2.8.1
+    devDependencies:
+      '@cdziv/devkit-error':
+        specifier: workspace:*
+        version: link:../error
 
   packages/devkit:
     dependencies:
@@ -634,9 +642,6 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
-
-  '@cdziv/devkit-error@0.1.1':
-    resolution: {integrity: sha512-J0tHnFst3i7sh4FBb7hen+K3SdvStZgDMvrbs6IdyYEkmWCE49pAFLYS9tmKYCYjKbrY+XR/wruDitTc9iKeOw==}
 
   '@cypress/request@3.0.8':
     resolution: {integrity: sha512-h0NFgh1mJmm1nr4jCwkGHwKneVYKghUyWe6TMNrk0B9zsjAJxpg8C4/+BAcmLgCPa1vj1V8rNUaILl+zYRUWBQ==}
@@ -2413,6 +2418,9 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
+  immutable@5.1.1:
+    resolution: {integrity: sha512-3jatXi9ObIsPGr3N5hGw/vWWcTkq6hUYhpQz4k0wLC+owqWi/LiugIw9x0EdNZ2yGedKN/HzePiBvaJRXa0Ujg==}
+
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
@@ -3403,6 +3411,10 @@ packages:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
 
+  type-fest@4.40.0:
+    resolution: {integrity: sha512-ABHZ2/tS2JkvH1PEjxFDTUWC8dB5OsIGZP4IFLhR293GqT5Y5qB1WwL2kMPYhQW9DVgVD8Hd7I8gjwPIf5GFkw==}
+    engines: {node: '>=16'}
+
   type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
     engines: {node: '>= 0.6'}
@@ -4354,8 +4366,6 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.9
 
   '@bcoe/v8-coverage@1.0.2': {}
-
-  '@cdziv/devkit-error@0.1.1': {}
 
   '@cypress/request@3.0.8':
     dependencies:
@@ -6260,6 +6270,8 @@ snapshots:
 
   ignore@5.3.2: {}
 
+  immutable@5.1.1: {}
+
   import-fresh@3.3.1:
     dependencies:
       parent-module: 1.0.1
@@ -7257,6 +7269,8 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
+
+  type-fest@4.40.0: {}
 
   type-is@1.6.18:
     dependencies:

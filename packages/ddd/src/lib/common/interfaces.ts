@@ -27,3 +27,12 @@ export type JsonifyDeep<T> = T extends Date
   : T extends Array<infer U>
   ? JsonifyDeep<U>[]
   : never;
+
+export type ValidationResult = string | Error | boolean | void;
+
+export type DomainEventProps<T extends JsonValue | void = void> = {
+  id?: string;
+  aggregateId: string;
+  timestamp?: number;
+  payload?: T;
+};

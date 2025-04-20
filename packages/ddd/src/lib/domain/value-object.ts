@@ -1,15 +1,16 @@
 import { isDeepStrictEqual } from 'node:util';
 import {
   ArgumentInvalidError,
-  DddError,
   deepJsonify,
   DomainObject,
   DomainPrimitive,
   DomainPrimitiveObject,
+  handleValidationResult,
   isDomainPrimitive,
   JsonifyDeep,
   JsonValue,
   ReadonlyDomainObjectProps,
+  ValidationResult,
 } from '../common';
 import { Map, MapOf, isMap } from 'immutable';
 import { Constructor } from 'type-fest';
@@ -43,7 +44,6 @@ type ValueObjectProps<T extends ValueObjectValue> = T extends DomainPrimitive
 type ImmutableValueObjectMap<T extends ValueObjectValue> = MapOf<
   ValueObjectProps<T>
 >;
-export type ValidationResult = string | Error | boolean | void;
 
 export abstract class ValueObject<
   T extends ValueObjectValue,
@@ -200,27 +200,12 @@ export abstract class ValueObject<
       throw new ArgumentInvalidError('The value must not be undefined');
     }
     const validationResult = this.validate(value);
-    this.handleValidationResult(validationResult);
+    handleValidationResult(validationResult);
 
     if (isDomainPrimitive(value)) return;
     if (Object.keys(value).length === 0) {
       throw new ArgumentInvalidError('The value must not be empty object');
     }
     return;
-  }
-  private handleValidationResult(result: ValidationResult): void {
-    if (result instanceof DddError) {
-      throw result;
-    }
-    if (result instanceof Error) {
-      const err = new ArgumentInvalidError(result.message);
-      throw err;
-    }
-    if (typeof result === 'string') {
-      throw new ArgumentInvalidError(result);
-    }
-    if (result === false) {
-      throw new ArgumentInvalidError();
-    }
   }
 }

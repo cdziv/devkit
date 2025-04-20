@@ -90,15 +90,16 @@ importers:
 
   packages/ddd:
     dependencies:
-      '@cdziv/devkit-error':
-        specifier: 0.1.4
-        version: 0.1.4
       immutable:
         specifier: ^5.1.1
         version: 5.1.1
       type-fest:
         specifier: ^4.40.0
         version: 4.40.0
+    devDependencies:
+      '@cdziv/devkit-error':
+        specifier: workspace:*
+        version: link:../error
 
   packages/devkit:
     dependencies:

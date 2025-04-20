@@ -9,15 +9,16 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     }
   },
   "dependencies": {
-    "@cdziv/devkit-error": "0.1.4",
     "immutable": "^5.1.1",
     "type-fest": "^4.40.0"
+  },
+  "devDependencies": {
+    "@cdziv/devkit-error": "workspace:*"
   }
 }

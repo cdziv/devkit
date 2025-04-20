@@ -16,6 +16,9 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2022"
+    "target": "es2022",
+    "paths": {
+      "@cdziv/devkit-error": ["packages/error/src/index.ts"]
+    }
   }
 }

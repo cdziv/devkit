@@ -40,6 +40,7 @@ describe('createErrorCodes', () => {
       moduleName,
       delimiter,
     });
+
     expect(errorCodes).toEqual({
       ERROR_1: 'MODULE.ERROR_1',
       ERROR_2: 'MODULE.ERROR_2',

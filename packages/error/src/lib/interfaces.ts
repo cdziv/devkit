@@ -27,3 +27,5 @@ export interface CreateErrorCodesOptions {
   moduleName?: string;
   delimiter?: string;
 }
+
+export type Values<ErrorCodes extends object> = ErrorCodes[keyof ErrorCodes];

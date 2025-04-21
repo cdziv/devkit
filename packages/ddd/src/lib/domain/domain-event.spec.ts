@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DomainEvent } from './domain-event';
-import { ArgumentInvalidError, handleValidationResult } from '../common';
+import { ArgumentInvalidError } from '../common';
 
 describe('DomainEvent', () => {
   describe('constructor', () => {
@@ -84,8 +84,8 @@ describe('DomainEvent', () => {
       ).toThrowError(ArgumentInvalidError);
     });
 
-    it('should call handleValidationResult with the result of validatePayload', () => {
-      vi.mock('../common', { spy: true });
+    it('should call handleValidationResult with the result of validatePayload', async () => {
+      const spy = vi.spyOn(await import('../common'), 'handleValidationResult');
       const validatePayloadReturn = Symbol();
       class TestEvent extends DomainEvent {
         validatePayload() {
@@ -94,9 +94,7 @@ describe('DomainEvent', () => {
       }
       new TestEvent('aggregate-id');
 
-      expect(handleValidationResult).toHaveBeenCalledWith(
-        validatePayloadReturn
-      );
+      expect(spy).toHaveBeenCalledWith(validatePayloadReturn);
       vi.restoreAllMocks();
     });
   });

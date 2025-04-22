@@ -8,7 +8,7 @@ import {
 } from '../common';
 
 export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
-  public readonly id: string;
+  public readonly eventId: string;
   public readonly aggregateId: string;
   public readonly timestamp: number;
   public readonly payload: T;
@@ -18,7 +18,7 @@ export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
       typeof aggregateIdOrProps === 'string'
         ? { aggregateId: aggregateIdOrProps }
         : aggregateIdOrProps;
-    this.id = props.id ?? randomUUID();
+    this.eventId = props.eventId ?? randomUUID();
     this.aggregateId = props.aggregateId;
     this.timestamp = props.timestamp ?? Date.now();
     this.payload = props.payload as T;

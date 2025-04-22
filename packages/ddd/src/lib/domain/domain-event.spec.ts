@@ -14,7 +14,7 @@ describe('DomainEvent', () => {
       const event = new TestEvent(aggregateId);
 
       expect(event).toBeInstanceOf(DomainEvent);
-      expect(event.id).toBeDefined();
+      expect(event.eventId).toBeDefined();
       expect(event.aggregateId).toBe(aggregateId);
       expect(event.timestamp).toBeDefined();
       expect(event.payload).toBeUndefined();
@@ -27,7 +27,7 @@ describe('DomainEvent', () => {
         }
       }
       const props = {
-        id: 'event-id',
+        eventId: 'event-id',
         aggregateId: 'aggregate-id',
         timestamp: Date.now(),
         payload: { data: 'test' },
@@ -36,7 +36,7 @@ describe('DomainEvent', () => {
 
       expect(event).toBeInstanceOf(DomainEvent);
       expect(event.payload).toEqual(props.payload);
-      expect(event.id).toBe(props.id);
+      expect(event.eventId).toBe(props.eventId);
       expect(event.aggregateId).toBe(props.aggregateId);
       expect(event.timestamp).toBe(props.timestamp);
     });

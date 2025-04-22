@@ -41,6 +41,17 @@ describe('DomainEvent', () => {
       expect(event.timestamp).toBe(props.timestamp);
     });
 
+    it('should use constructor name as event type by default', () => {
+      class TestEvent extends DomainEvent {
+        validatePayload() {
+          return;
+        }
+      }
+      const event = new TestEvent('aggregate-id');
+
+      expect(event.eventType).toBe('TestEvent');
+    });
+
     it('should throw an ArgumentInvalidError if aggregateId is empty', () => {
       class TestEvent extends DomainEvent {
         validatePayload() {

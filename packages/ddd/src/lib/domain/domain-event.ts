@@ -9,6 +9,7 @@ import {
 
 export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
   public readonly eventId: string;
+  public readonly eventType: string = this.constructor.name;
   public readonly aggregateId: string;
   public readonly timestamp: number;
   public readonly payload: T;

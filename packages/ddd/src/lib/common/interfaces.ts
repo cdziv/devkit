@@ -34,5 +34,7 @@ export type DomainEventProps<T extends JsonValue | void = void> = {
   eventId?: string;
   aggregateId: string;
   timestamp?: number;
+  correlationId?: string;
+  causationId?: string;
   payload?: T;
 };

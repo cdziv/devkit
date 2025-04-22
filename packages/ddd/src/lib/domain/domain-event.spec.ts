@@ -17,6 +17,8 @@ describe('DomainEvent', () => {
       expect(event.eventId).toBeDefined();
       expect(event.aggregateId).toBe(aggregateId);
       expect(event.timestamp).toBeDefined();
+      expect(event.correlationId).toBeUndefined();
+      expect(event.causationId).toBeUndefined();
       expect(event.payload).toBeUndefined();
     });
 
@@ -30,6 +32,8 @@ describe('DomainEvent', () => {
         eventId: 'event-id',
         aggregateId: 'aggregate-id',
         timestamp: Date.now(),
+        correlationId: 'correlation-id',
+        causationId: 'causation-id',
         payload: { data: 'test' },
       };
       const event = new TestEvent(props);
@@ -38,6 +42,8 @@ describe('DomainEvent', () => {
       expect(event.payload).toEqual(props.payload);
       expect(event.eventId).toBe(props.eventId);
       expect(event.aggregateId).toBe(props.aggregateId);
+      expect(event.correlationId).toBe(props.correlationId);
+      expect(event.causationId).toBe(props.causationId);
       expect(event.timestamp).toBe(props.timestamp);
     });
 

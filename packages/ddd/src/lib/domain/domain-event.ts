@@ -13,6 +13,8 @@ export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
   public readonly aggregateId: string;
   public readonly timestamp: number;
   public readonly payload: T;
+  public readonly correlationId?: string;
+  public readonly causationId?: string;
 
   constructor(aggregateIdOrProps: string | DomainEventProps<T>) {
     const props =
@@ -22,6 +24,8 @@ export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
     this.eventId = props.eventId ?? randomUUID();
     this.aggregateId = props.aggregateId;
     this.timestamp = props.timestamp ?? Date.now();
+    this.correlationId = props.correlationId;
+    this.causationId = props.causationId;
     this.payload = props.payload as T;
     this.validateProps();
   }

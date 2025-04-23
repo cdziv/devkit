@@ -20,5 +20,6 @@
     "paths": {
       "@cdziv/devkit-error": ["packages/error/src/index.ts"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

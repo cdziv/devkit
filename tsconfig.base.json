@@ -15,6 +15,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
+    "incremental": true,
     "strict": true,
     "target": "es2022",
     "paths": {

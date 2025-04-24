@@ -10,9 +10,8 @@ import {
   ReadonlyDomainObjectProps,
   ValidationResult,
 } from '../common';
-import { Map, MapOf, isMap, List } from 'immutable';
+import { Map, MapOf, isMap } from 'immutable';
 import { ValueObject, ValueObjectValue } from './value-object';
-import { DomainEvent } from './domain-event';
 import { EntityId } from './entity-id';
 import { Constructor } from 'type-fest';
 
@@ -29,34 +28,27 @@ export type EntityProps = Record<
   | ValueObject<any>
   | Entity<any>
 >;
-type ImmutableProps<T extends EntityProps> = MapOf<T>;
-type ImmutableEvents = List<DomainEvent>;
+export type ImmutableProps<T extends EntityProps> = MapOf<T>;
 
 export abstract class Entity<
   T extends EntityProps,
   ID extends EntityId<ValueObjectValue> = EntityId<string>,
   J extends JsonValue = JsonifyDeep<T>
 > extends DomainObject<J> {
-  private readonly immutableProps: ImmutableProps<T>;
-  private readonly immutableEvents: List<DomainEvent>;
+  protected readonly immutableProps: ImmutableProps<T>;
+  // private readonly immutableEvents: List<DomainEvent>;
   private cachedProps: ReadonlyDomainObjectProps<T>;
-  private cachedEvents?: ReadonlyDomainObjectProps<DomainEvent[]>;
+  // private cachedEvents?: ReadonlyDomainObjectProps<DomainEvent[]>;
 
-  constructor(props: T, events?: DomainEvent[]);
-  constructor(
-    immutableProps: ImmutableProps<T>,
-    immutableEvents?: DomainEvent[]
-  );
-  constructor(
-    propsOrImmutableProps: T | ImmutableProps<T>,
-    eventsOrImmutableEvents?: DomainEvent[] | ImmutableEvents
-  ) {
+  constructor(props: T);
+  constructor(immutableProps: ImmutableProps<T>);
+  constructor(propsOrImmutableProps: T | ImmutableProps<T>) {
     super();
 
     const isImmutableProps = isMap(propsOrImmutableProps);
-    const isImmutableEvents = eventsOrImmutableEvents
-      ? isMap(eventsOrImmutableEvents)
-      : false;
+    // const isImmutableEvents = eventsOrImmutableEvents
+    //   ? isMap(eventsOrImmutableEvents)
+    //   : false;
 
     const props = isImmutableProps
       ? (propsOrImmutableProps.toJSON() as T)
@@ -65,9 +57,9 @@ export abstract class Entity<
 
     this.cachedProps = DomainObject.convertPropsToReadonly(props);
     this.immutableProps = isImmutableProps ? propsOrImmutableProps : Map(props);
-    this.immutableEvents = isImmutableEvents
-      ? (eventsOrImmutableEvents as ImmutableEvents)
-      : List(eventsOrImmutableEvents ?? []);
+    // this.immutableEvents = isImmutableEvents
+    //   ? (eventsOrImmutableEvents as ImmutableEvents)
+    //   : List(eventsOrImmutableEvents ?? []);
   }
 
   abstract get id(): ID;
@@ -110,15 +102,15 @@ export abstract class Entity<
           : propOrPropUpdater;
       const key = partialPropsOrKeyOrUpdater as K;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return this.withProps({ [key]: newPropValue } as any);
+      return this.withEntityProps({ [key]: newPropValue } as any);
     }
 
     return typeof partialPropsOrKeyOrUpdater === 'function'
-      ? this.withProps(partialPropsOrKeyOrUpdater(this) as Partial<T>)
-      : this.withProps(partialPropsOrKeyOrUpdater as Partial<T>);
+      ? this.withEntityProps(partialPropsOrKeyOrUpdater(this) as Partial<T>)
+      : this.withEntityProps(partialPropsOrKeyOrUpdater as Partial<T>);
   }
 
-  private withProps(partialProps: Partial<T>): this {
+  private withEntityProps(partialProps: Partial<T>): this {
     let newImmutableProps = this.immutableProps;
     for (const key in partialProps) {
       const value = partialProps[key] as any;
@@ -129,8 +121,8 @@ export abstract class Entity<
       }
     }
     return new (this.constructor as Constructor<this>)(
-      newImmutableProps,
-      this.immutableEvents
+      newImmutableProps
+      // this.immutableEvents
     );
   }
 
@@ -142,14 +134,14 @@ export abstract class Entity<
     return this.cachedProps;
   }
 
-  get events(): ReadonlyDomainObjectProps<DomainEvent[]> {
-    if (!this.cachedEvents) {
-      this.cachedEvents = DomainObject.convertPropsToReadonly(
-        this.immutableEvents.toArray()
-      );
-    }
-    return this.cachedEvents;
-  }
+  // get events(): ReadonlyDomainObjectProps<DomainEvent[]> {
+  //   if (!this.cachedEvents) {
+  //     this.cachedEvents = DomainObject.convertPropsToReadonly(
+  //       this.immutableEvents.toArray()
+  //     );
+  //   }
+  //   return this.cachedEvents;
+  // }
 
   private validateProps(props: T): void {
     if (props === undefined) {

@@ -38,3 +38,7 @@ export type DomainEventProps<T extends JsonValue | void = void> = {
   causationId?: string;
   payload?: T;
 };
+
+export interface DomainEventEmitter {
+  emit(...args: any[]): void;
+}

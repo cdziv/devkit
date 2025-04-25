@@ -1,3 +1,17 @@
+export type Decrement<N extends number> = [
+  never,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9
+][N];
+
 export type Primitive = string | number | boolean | null | undefined;
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonObject = { [K in string]: JsonValue } & {
@@ -14,7 +28,7 @@ export type DomainPrimitiveObject = {
 export interface Jsonifiable<T extends JsonValue> {
   toJSON(): T;
 }
-export type JsonifyDeep<T> = T extends Date
+export type JsonifyDeep<T, Depth extends number = 4> = T extends Date
   ? string
   : T extends JsonValue
   ? T
@@ -23,9 +37,9 @@ export type JsonifyDeep<T> = T extends Date
   : T extends Jsonifiable<infer U>
   ? U
   : T extends Record<string, unknown>
-  ? { [K in keyof T]: JsonifyDeep<T[K]> }
+  ? { [K in keyof T]: JsonifyDeep<T[K], Decrement<Depth>> }
   : T extends Array<infer U>
-  ? JsonifyDeep<U>[]
+  ? JsonifyDeep<U, Decrement<Depth>>[]
   : never;
 
 export type ValidationResult = string | Error | boolean | void;

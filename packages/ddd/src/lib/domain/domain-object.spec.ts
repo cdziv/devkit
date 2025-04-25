@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DomainObject } from './domain-object.base';
+import { DomainObject } from './domain-object';
 
 describe('DomainObject', () => {
   describe('convertPropsToReadonly', () => {

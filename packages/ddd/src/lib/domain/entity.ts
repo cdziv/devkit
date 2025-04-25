@@ -1,34 +1,18 @@
+import { Map, MapOf, isMap } from 'immutable';
 import {
-  ArgumentInvalidError,
-  deepJsonify,
-  DomainObject,
   DomainPrimitive,
   DomainPrimitiveObject,
-  handleValidationResult,
   JsonifyDeep,
   JsonValue,
-  ReadonlyDomainObjectProps,
   ValidationResult,
-} from '../common';
-import { Map, MapOf, isMap } from 'immutable';
+} from '../interfaces';
+import { ArgumentInvalidError } from '../errors';
+import { deepJsonify } from '../utils';
+import { handleValidationResult } from '../helpers';
+import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
 import { ValueObject, ValueObjectValue } from './value-object';
 import { EntityId } from './entity-id';
 import { Constructor } from 'type-fest';
-
-/**
- * @remarks
- * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
- * so `type` must be used instead. If a better solution is found, this part should be revised.
- */
-export type EntityProps = Record<
-  string,
-  | DomainPrimitive
-  | DomainPrimitive[]
-  | DomainPrimitiveObject
-  | ValueObject<any>
-  | Entity<any>
->;
-export type ImmutableProps<T extends EntityProps> = MapOf<T>;
 
 export abstract class Entity<
   T extends EntityProps,
@@ -36,9 +20,7 @@ export abstract class Entity<
   J extends JsonValue = JsonifyDeep<T>
 > extends DomainObject<J> {
   protected readonly immutableProps: ImmutableProps<T>;
-  // private readonly immutableEvents: List<DomainEvent>;
   private cachedProps: ReadonlyDomainObjectProps<T>;
-  // private cachedEvents?: ReadonlyDomainObjectProps<DomainEvent[]>;
 
   constructor(props: T);
   constructor(immutableProps: ImmutableProps<T>);
@@ -46,10 +28,6 @@ export abstract class Entity<
     super();
 
     const isImmutableProps = isMap(propsOrImmutableProps);
-    // const isImmutableEvents = eventsOrImmutableEvents
-    //   ? isMap(eventsOrImmutableEvents)
-    //   : false;
-
     const props = isImmutableProps
       ? (propsOrImmutableProps.toJSON() as T)
       : propsOrImmutableProps;
@@ -57,9 +35,6 @@ export abstract class Entity<
 
     this.cachedProps = DomainObject.convertPropsToReadonly(props);
     this.immutableProps = isImmutableProps ? propsOrImmutableProps : Map(props);
-    // this.immutableEvents = isImmutableEvents
-    //   ? (eventsOrImmutableEvents as ImmutableEvents)
-    //   : List(eventsOrImmutableEvents ?? []);
   }
 
   abstract get id(): ID;
@@ -120,10 +95,7 @@ export abstract class Entity<
         newImmutableProps = newImmutableProps.set(key as keyof T, value);
       }
     }
-    return new (this.constructor as Constructor<this>)(
-      newImmutableProps
-      // this.immutableEvents
-    );
+    return new (this.constructor as Constructor<this>)(newImmutableProps);
   }
 
   toJSON(): J {
@@ -133,15 +105,6 @@ export abstract class Entity<
   get props(): ReadonlyDomainObjectProps<T> {
     return this.cachedProps;
   }
-
-  // get events(): ReadonlyDomainObjectProps<DomainEvent[]> {
-  //   if (!this.cachedEvents) {
-  //     this.cachedEvents = DomainObject.convertPropsToReadonly(
-  //       this.immutableEvents.toArray()
-  //     );
-  //   }
-  //   return this.cachedEvents;
-  // }
 
   private validateProps(props: T): void {
     if (props === undefined) {
@@ -156,3 +119,18 @@ export abstract class Entity<
     return;
   }
 }
+
+/**
+ * @remarks
+ * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
+ * so `type` must be used instead. If a better solution is found, this part should be revised.
+ */
+export type EntityProps = Record<
+  string,
+  | DomainPrimitive
+  | DomainPrimitive[]
+  | DomainPrimitiveObject
+  | ValueObject<any>
+  | Entity<any>
+>;
+export type ImmutableProps<T extends EntityProps> = MapOf<T>;

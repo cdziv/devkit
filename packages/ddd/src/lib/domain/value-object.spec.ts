@@ -1,10 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import {
-  ArgumentInvalidError,
-  DddError,
-  DomainPrimitive,
-  ValidationResult,
-} from '../common';
+import { DomainPrimitive, ValidationResult } from '../interfaces';
+import { ArgumentInvalidError } from '../errors';
+import { DddError } from '../errors';
 import { ValueObject } from './value-object';
 
 describe('ValueObject', () => {

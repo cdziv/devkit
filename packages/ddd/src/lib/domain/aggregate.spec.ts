@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DomainEventEmitter, ValidationResult } from '../common';
+import { DomainEventEmitter, ValidationResult } from '../interfaces';
 import { EntityId } from './entity-id';
 import { List, Map } from 'immutable';
 import { Aggregate } from './aggregate';

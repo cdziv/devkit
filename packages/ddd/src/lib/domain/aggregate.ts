@@ -1,18 +1,11 @@
-import {
-  DomainEventEmitter,
-  DomainObject,
-  JsonifyDeep,
-  JsonValue,
-  ReadonlyDomainObjectProps,
-} from '../common';
 import { isMap, List } from 'immutable';
+import { DomainEventEmitter, JsonifyDeep, JsonValue } from '../interfaces';
+import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
 import { ValueObjectValue } from './value-object';
 import { DomainEvent } from './domain-event';
 import { EntityId } from './entity-id';
 import { Constructor } from 'type-fest';
 import { Entity, EntityProps, ImmutableProps } from './entity';
-
-type ImmutableEvents = List<DomainEvent>;
 
 export abstract class Aggregate<
   T extends EntityProps,
@@ -109,3 +102,5 @@ export abstract class Aggregate<
     );
   }
 }
+
+type ImmutableEvents = List<DomainEvent>;

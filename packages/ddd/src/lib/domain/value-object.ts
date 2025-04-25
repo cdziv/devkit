@@ -1,49 +1,17 @@
 import { isDeepStrictEqual } from 'node:util';
 import {
-  ArgumentInvalidError,
-  deepJsonify,
-  DomainObject,
   DomainPrimitive,
   DomainPrimitiveObject,
-  handleValidationResult,
-  isDomainPrimitive,
   JsonifyDeep,
   JsonValue,
-  ReadonlyDomainObjectProps,
   ValidationResult,
-} from '../common';
+} from '../interfaces';
+import { ArgumentInvalidError } from '../errors';
+import { deepJsonify, isDomainPrimitive } from '../utils';
+import { handleValidationResult } from '../helpers';
+import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
 import { Map, MapOf, isMap } from 'immutable';
 import { Constructor } from 'type-fest';
-
-/**
- * @remarks
- * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
- * so `type` must be used instead. If a better solution is found, this part should be revised.
- */
-export type ValueObjectValue =
-  | DomainPrimitive
-  | Record<
-      string,
-      | DomainPrimitive
-      | DomainPrimitive[]
-      | DomainPrimitiveObject
-      | ValueObject<any>
-    >;
-type PrimitiveValue<T extends ValueObjectValue> = T extends DomainPrimitive
-  ? T
-  : never;
-type PartialValue<T extends ValueObjectValue> = T extends DomainPrimitive
-  ? never
-  : Partial<T>;
-type ValueObjectValueKeys<T extends ValueObjectValue> =
-  T extends DomainPrimitive ? never : keyof T;
-export type WrappedPrimitive<T> = { value: T };
-type ValueObjectProps<T extends ValueObjectValue> = T extends DomainPrimitive
-  ? WrappedPrimitive<T>
-  : T;
-type ImmutableValueObjectMap<T extends ValueObjectValue> = MapOf<
-  ValueObjectProps<T>
->;
 
 export abstract class ValueObject<
   T extends ValueObjectValue,
@@ -209,3 +177,33 @@ export abstract class ValueObject<
     return;
   }
 }
+
+/**
+ * @remarks
+ * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
+ * so `type` must be used instead. If a better solution is found, this part should be revised.
+ */
+export type ValueObjectValue =
+  | DomainPrimitive
+  | Record<
+      string,
+      | DomainPrimitive
+      | DomainPrimitive[]
+      | DomainPrimitiveObject
+      | ValueObject<any>
+    >;
+type PrimitiveValue<T extends ValueObjectValue> = T extends DomainPrimitive
+  ? T
+  : never;
+type PartialValue<T extends ValueObjectValue> = T extends DomainPrimitive
+  ? never
+  : Partial<T>;
+type ValueObjectValueKeys<T extends ValueObjectValue> =
+  T extends DomainPrimitive ? never : keyof T;
+type WrappedPrimitive<T> = { value: T };
+type ValueObjectProps<T extends ValueObjectValue> = T extends DomainPrimitive
+  ? WrappedPrimitive<T>
+  : T;
+type ImmutableValueObjectMap<T extends ValueObjectValue> = MapOf<
+  ValueObjectProps<T>
+>;

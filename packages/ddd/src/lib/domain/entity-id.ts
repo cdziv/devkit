@@ -1,4 +1,4 @@
-import { JsonifyDeep, JsonValue } from '../common';
+import { JsonifyDeep, JsonValue } from '../interfaces';
 import { ValueObject, ValueObjectValue } from './value-object';
 
 export abstract class EntityId<

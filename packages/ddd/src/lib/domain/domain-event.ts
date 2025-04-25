@@ -1,11 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import {
-  ArgumentInvalidError,
-  JsonValue,
-  DomainEventProps,
-  ValidationResult,
-  handleValidationResult,
-} from '../common';
+import { ArgumentInvalidError } from '../errors';
+import { JsonValue, ValidationResult, DomainEventProps } from '../interfaces';
+import { handleValidationResult } from '../helpers';
 
 export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
   public readonly eventId: string;

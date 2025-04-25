@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ArgumentInvalidError, ValidationResult } from '../common';
+import { ValidationResult } from '../interfaces';
+import { ArgumentInvalidError } from '../errors';
 import { Entity } from './entity';
 import { ValueObject } from './value-object';
 import { EntityId } from './entity-id';
@@ -144,7 +145,10 @@ describe('Entity', () => {
     });
 
     it('should call handleValidationResult with the result of validateProps', async () => {
-      const spy = vi.spyOn(await import('../common'), 'handleValidationResult');
+      const spy = vi.spyOn(
+        await import('../helpers'),
+        'handleValidationResult'
+      );
       const validatePayloadReturn = Symbol();
       class TestEntity extends Entity<SimpleProps> {
         get id(): Id {

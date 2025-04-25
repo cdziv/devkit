@@ -1,12 +1,9 @@
-import { Jsonifiable, JsonValue, Primitive } from './interfaces';
-import { isPrimitive } from './utils/is-primitive';
+import { Jsonifiable, JsonValue, Primitive } from '../interfaces';
+import { isPrimitive } from '../utils/is-primitive';
 
 export abstract class DomainObject<J extends JsonValue>
   implements Jsonifiable<J>
 {
-  // @ts-expect-error allow no read
-  private readonly _isDomainObject = true;
-
   abstract toJSON(): J;
 
   static convertPropsToReadonly<T>(props: T): ReadonlyDomainObjectProps<T> {

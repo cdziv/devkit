@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DomainEvent } from './domain-event';
-import { ArgumentInvalidError } from '../common';
+import { ArgumentInvalidError } from '../errors';
 
 describe('DomainEvent', () => {
   describe('constructor', () => {
@@ -102,7 +102,10 @@ describe('DomainEvent', () => {
     });
 
     it('should call handleValidationResult with the result of validatePayload', async () => {
-      const spy = vi.spyOn(await import('../common'), 'handleValidationResult');
+      const spy = vi.spyOn(
+        await import('../helpers'),
+        'handleValidationResult'
+      );
       const validatePayloadReturn = Symbol();
       class TestEvent extends DomainEvent {
         validatePayload() {

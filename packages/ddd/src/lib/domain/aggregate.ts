@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { isMap, List } from 'immutable';
 import { DomainEventEmitter, JsonifyDeep, JsonValue } from '../interfaces';
 import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
@@ -49,7 +51,6 @@ export abstract class Aggregate<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = partialPropsOrKeyOrUpdater as K;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return this.withAggregateProps({ [key]: newPropValue } as any);
     }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Jsonifiable, JsonValue, Primitive } from '../interfaces';
 import { isPrimitive } from '../utils/is-primitive';
 

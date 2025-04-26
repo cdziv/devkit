@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { isDeepStrictEqual } from 'node:util';
 import {
   DomainPrimitive,
@@ -88,7 +90,6 @@ export abstract class ValueObject<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = primitiveValueOrPartialValueOrKeyOrUpdater as K;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return this.withProps({ [key]: newPropValue } as any);
     }
 

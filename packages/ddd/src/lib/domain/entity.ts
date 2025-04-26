@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Map, MapOf, isMap } from 'immutable';
 import {
   DomainPrimitive,
@@ -76,7 +78,6 @@ export abstract class Entity<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = partialPropsOrKeyOrUpdater as K;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return this.withEntityProps({ [key]: newPropValue } as any);
     }
 

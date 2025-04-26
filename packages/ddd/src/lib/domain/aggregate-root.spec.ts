@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { DomainEventEmitter, ValidationResult } from '../interfaces';
 import { EntityId } from './entity-id';
 import { List, Map } from 'immutable';
-import { Aggregate } from './aggregate';
+import { AggregateRoot } from './aggregate-root';
 import { DomainEvent } from './domain-event';
 
-describe('Aggregate', () => {
+describe('AggregateRoot', () => {
   class Id extends EntityId<string> {
     get rawId() {
       return this.value;
@@ -19,7 +19,7 @@ describe('Aggregate', () => {
     name: string;
     age: number;
   };
-  class TestAggregate extends Aggregate<AggregateProps> {
+  class TestAggregate extends AggregateRoot<AggregateProps> {
     // composite from props
     get id(): Id {
       return new Id(`${this.props.name}-${this.props.age}`);

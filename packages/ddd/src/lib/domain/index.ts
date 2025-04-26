@@ -4,5 +4,5 @@ export type { ValueObjectValue } from './value-object';
 export { EntityId } from './entity-id';
 export { Entity } from './entity';
 export type { EntityProps } from './entity';
-export { Aggregate } from './aggregate';
+export { AggregateRoot } from './aggregate-root';
 export { DomainEvent } from './domain-event';

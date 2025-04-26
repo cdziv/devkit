@@ -9,7 +9,7 @@ import { EntityId } from './entity-id';
 import { Constructor } from 'type-fest';
 import { Entity, EntityProps, ImmutableProps } from './entity';
 
-export abstract class Aggregate<
+export abstract class AggregateRoot<
   T extends EntityProps,
   ID extends EntityId<ValueObjectValue> = EntityId<string>,
   J extends JsonValue = JsonifyDeep<T>

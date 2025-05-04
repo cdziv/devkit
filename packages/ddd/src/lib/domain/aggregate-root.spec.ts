@@ -90,7 +90,7 @@ describe('AggregateRoot', () => {
     });
   });
 
-  describe('withMutations', () => {
+  describe('evolve', () => {
     it('should return a new instance with updated prop and existed events', () => {
       const events = [
         new TestDomainEvent('aggregate-id'),
@@ -103,7 +103,7 @@ describe('AggregateRoot', () => {
         },
         events
       );
-      const updated = original.withMutations({
+      const updated = original.evolve({
         name: 'bar',
       });
 

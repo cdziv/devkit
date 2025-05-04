@@ -44,21 +44,21 @@ const invalidName = '';
 expect(() => new Username(invalidName)).toThrow(ArgumentInvalidError);
 ```
 
-Next, we’ll design the chip stack as a value object. Here, we use `ChipCount` as a property of `StackValue`, so `Stack` doesn’t need to worry about whether the property value is a positive integer, encapsulating that domain invariant logic in `ChipCount`. We also define some behaviors for them, using `withMutations` to update their values:
+Next, we’ll design the chip stack as a value object. Here, we use `ChipCount` as a property of `StackValue`, so `Stack` doesn’t need to worry about whether the property value is a positive integer, encapsulating that domain invariant logic in `ChipCount`. We also define some behaviors for them, using `evolve` to update their values:
 
 ```ts
 type ChipCountValue = number;
 class ChipCount extends ValueObject<ChipCountValue> {
   add(count: ChipCount): ChipCount {
-    return this.withMutations(this.value + count.value);
+    return this.evolve(this.value + count.value);
   }
 
   subtract(count: ChipCount): ChipCount {
     if (count.value > this.value) {
       throw new DddError('Not enough chips');
     }
-    // Another usage of withMutations
-    return this.withMutations((originalValue) => originalValue - count.value);
+    // Another usage of evolve
+    return this.evolve((originalValue) => originalValue - count.value);
   }
 
   validate(value: ChipCountValue): ValidationResult {
@@ -78,24 +78,24 @@ class Stack extends ValueObject<StackValue> {
     if (this.value.balance.value < count.value) {
       throw new DddError('Not enough balance');
     }
-    // Another usage of withMutations
-    return this.withMutations((originalValue) => ({
+    // Another usage of evolve
+    return this.evolve((originalValue) => ({
       balance: originalValue.balance.subtract(count),
       bet: originalValue.bet.add(count),
     }));
   }
 
   win(count: ChipCount): Stack {
-    // Another usage of withMutations
-    return this.withMutations({
+    // Another usage of evolve
+    return this.evolve({
       balance: this.value.balance.add(count),
       bet: new ChipCount(0),
     });
   }
 
   pay(): Stack {
-    // Another usage of withMutations
-    return this.withMutations('bet', new ChipCount(0));
+    // Another usage of evolve
+    return this.evolve('bet', new ChipCount(0));
   }
 
   validate(value: StackValue): ValidationResult {
@@ -110,7 +110,7 @@ class Stack extends ValueObject<StackValue> {
 }
 ```
 
-Note that we design all domain objects as immutable, so `withMutations` returns a new value object instead of modifying the existing one. This ensures that domain objects always adhere to domain invariants. The instantiation process calls the `validate` method, and as long as you successfully create the object—whether through creation, persistence restoration, or `withMutations`—you must maintain its domain invariants, or an error should be thrown.
+Note that we design all domain objects as immutable, so `evolve` returns a new value object instead of modifying the existing one. This ensures that domain objects always adhere to domain invariants. The instantiation process calls the `validate` method, and as long as you successfully create the object—whether through creation, persistence restoration, or `evolve`—you must maintain its domain invariants, or an error should be thrown.
 
 You can use the `equals` method to compare whether two value objects have the same value:
 
@@ -180,7 +180,7 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   fold() {
     const event = new PlayerFolded(this.id.rawId);
-    return this.withMutations('folded', true).addEvent(event);
+    return this.evolve('folded', true).addEvent(event);
   }
 
   check() {
@@ -190,7 +190,7 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   raise(count: ChipCount) {
     const event = new PlayerRaised(this.id.rawId);
-    return this.withMutations('stack', stack.raise(count)).addEvent(event);
+    return this.evolve('stack', stack.raise(count)).addEvent(event);
   }
 
   // ... implementation details ...

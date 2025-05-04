@@ -275,7 +275,7 @@ describe('Entity', () => {
     });
   });
 
-  describe('withMutations', () => {
+  describe('evolve', () => {
     it('should return a new instance with updated prop', () => {
       const entity = new ComplexEntity({
         id: new Id('complex-entity-id'),
@@ -291,7 +291,7 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.withMutations({
+      const updated = entity.evolve({
         name: 'bar',
       });
 
@@ -327,7 +327,7 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.withMutations((entity) => ({
+      const updated = entity.evolve((entity) => ({
         name: entity.props.name + 'bar',
       }));
 
@@ -363,7 +363,7 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.withMutations('name', 'bar');
+      const updated = entity.evolve('name', 'bar');
 
       expect(updated).not.toBe(entity);
       expect(updated.props).toEqual({
@@ -397,7 +397,7 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.withMutations('name', 'bar');
+      const updated = entity.evolve('name', 'bar');
 
       expect(updated).not.toBe(entity);
       expect(updated.props).toEqual({
@@ -431,7 +431,7 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.withMutations({
+      const updated = entity.evolve({
         nestedObj: {
           firstName: 'bar',
         },

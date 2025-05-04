@@ -33,7 +33,7 @@ export abstract class Entity<
     const props = isImmutableProps
       ? (propsOrImmutableProps.toJSON() as T)
       : propsOrImmutableProps;
-    this.validateProps(props);
+    this.validateProps_(props);
 
     this.cachedProps = DomainObject.convertPropsToReadonly(props);
     this.immutableProps = isImmutableProps ? propsOrImmutableProps : Map(props);
@@ -78,15 +78,15 @@ export abstract class Entity<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = partialPropsOrKeyOrUpdater as K;
-      return this.withEntityProps({ [key]: newPropValue } as any);
+      return this.withEntityProps_({ [key]: newPropValue } as any);
     }
 
     return typeof partialPropsOrKeyOrUpdater === 'function'
-      ? this.withEntityProps(partialPropsOrKeyOrUpdater(this) as Partial<T>)
-      : this.withEntityProps(partialPropsOrKeyOrUpdater as Partial<T>);
+      ? this.withEntityProps_(partialPropsOrKeyOrUpdater(this) as Partial<T>)
+      : this.withEntityProps_(partialPropsOrKeyOrUpdater as Partial<T>);
   }
 
-  private withEntityProps(partialProps: Partial<T>): this {
+  private withEntityProps_(partialProps: Partial<T>): this {
     let newImmutableProps = this.immutableProps;
     for (const key in partialProps) {
       const value = partialProps[key] as any;
@@ -107,7 +107,7 @@ export abstract class Entity<
     return this.cachedProps;
   }
 
-  private validateProps(props: T): void {
+  private validateProps_(props: T): void {
     if (props === undefined) {
       throw new ArgumentInvalidError('The props must not be undefined');
     }

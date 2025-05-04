@@ -23,10 +23,10 @@ export abstract class DomainEvent<T extends JsonValue | undefined = undefined> {
     this.correlationId = props.correlationId;
     this.causationId = props.causationId;
     this.payload = props.payload as T;
-    this.validateProps();
+    this.validateProps_();
   }
 
-  private validateProps() {
+  private validateProps_() {
     if (
       typeof this.aggregateId !== 'string' ||
       this.aggregateId?.length === 0

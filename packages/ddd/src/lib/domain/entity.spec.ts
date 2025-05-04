@@ -114,7 +114,7 @@ describe('Entity', () => {
       ).toBeInstanceOf(ComplexEntity);
     });
 
-    it('should call validateProps method with the passed props', () => {
+    it('should call validateProps_ method with the passed props', () => {
       const spy = vi.spyOn(SimpleEntity.prototype, 'validate');
       new SimpleEntity({
         name: 'foo',
@@ -128,7 +128,7 @@ describe('Entity', () => {
       spy.mockRestore();
     });
 
-    it('should call validateProps method with the props of passed immutable props', () => {
+    it('should call validateProps_ method with the props of passed immutable props', () => {
       const spy = vi.spyOn(SimpleEntity.prototype, 'validate');
       new SimpleEntity(
         Map({
@@ -144,7 +144,7 @@ describe('Entity', () => {
       spy.mockRestore();
     });
 
-    it('should call handleValidationResult with the result of validateProps', async () => {
+    it('should call handleValidationResult with the result of validateProps_', async () => {
       const spy = vi.spyOn(
         await import('../helpers'),
         'handleValidationResult'

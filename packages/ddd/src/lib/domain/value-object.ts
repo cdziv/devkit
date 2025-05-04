@@ -28,15 +28,17 @@ export abstract class ValueObject<
 
     const isImmutableMap = isMap(valueOrImmutableMap);
     const value = isImmutableMap
-      ? this.getValue(
+      ? this.getValue_(
           (
             valueOrImmutableMap as ImmutableValueObjectMap<T>
           ).toJSON() as ValueObjectProps<T>
         )
       : (valueOrImmutableMap as T);
-    this.validateValue(value);
+    this.validateValue_(value);
     this.isDomainPrimitive = isDomainPrimitive(value);
-    this.map = isImmutableMap ? valueOrImmutableMap : Map(this.getProps(value));
+    this.map = isImmutableMap
+      ? valueOrImmutableMap
+      : Map(this.getProps_(value));
   }
 
   protected abstract validate(props: T): ValidationResult;
@@ -88,35 +90,35 @@ export abstract class ValueObject<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = primitiveValueOrPartialValueOrKeyOrUpdater as K;
-      return this.withProps({ [key]: newPropValue } as any);
+      return this.withProps_({ [key]: newPropValue } as any);
     }
 
     if (this.isDomainPrimitive) {
       return typeof primitiveValueOrPartialValueOrKeyOrUpdater === 'function'
-        ? this.withDomainPrimitiveValue(
+        ? this.withDomainPrimitiveValue_(
             primitiveValueOrPartialValueOrKeyOrUpdater(
               this
             ) as PrimitiveValue<T>
           )
-        : this.withDomainPrimitiveValue(
+        : this.withDomainPrimitiveValue_(
             primitiveValueOrPartialValueOrKeyOrUpdater as PrimitiveValue<T>
           );
     }
 
     return typeof primitiveValueOrPartialValueOrKeyOrUpdater === 'function'
-      ? this.withProps(
+      ? this.withProps_(
           primitiveValueOrPartialValueOrKeyOrUpdater(this) as PartialValue<T>
         )
-      : this.withProps(
+      : this.withProps_(
           primitiveValueOrPartialValueOrKeyOrUpdater as PartialValue<T>
         );
   }
-  private withDomainPrimitiveValue(
+  private withDomainPrimitiveValue_(
     value: T extends DomainPrimitive ? T : never
   ): this {
     return new (this.constructor as Constructor<this>)(value);
   }
-  private withProps(
+  private withProps_(
     partialProps: T extends DomainPrimitive ? never : Partial<T>
   ): this {
     let newMap = this.map;
@@ -141,20 +143,20 @@ export abstract class ValueObject<
         this.map.toJSON() as ValueObjectProps<T>
       );
     }
-    return this.getValue(this.cachedProps);
+    return this.getValue_(this.cachedProps);
   }
 
-  private getProps(value: T): ValueObjectProps<T> {
+  private getProps_(value: T): ValueObjectProps<T> {
     return this.isDomainPrimitive
       ? ({ value } as ValueObjectProps<T>)
       : (value as ValueObjectProps<T>);
   }
 
-  private getValue(props: ValueObjectProps<T>): T;
-  private getValue(
+  private getValue_(props: ValueObjectProps<T>): T;
+  private getValue_(
     props: ReadonlyDomainObjectProps<ValueObjectProps<T>>
   ): ReadonlyDomainObjectProps<T>;
-  private getValue(
+  private getValue_(
     props: ValueObjectProps<T> | ReadonlyDomainObjectProps<ValueObjectProps<T>>
   ): T | ReadonlyDomainObjectProps<T> {
     return this.isDomainPrimitive
@@ -162,7 +164,7 @@ export abstract class ValueObject<
       : (props as ReadonlyDomainObjectProps<T>);
   }
 
-  private validateValue(value: T): void {
+  private validateValue_(value: T): void {
     if (value === undefined) {
       throw new ArgumentInvalidError('The value must not be undefined');
     }

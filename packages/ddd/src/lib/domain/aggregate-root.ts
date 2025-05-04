@@ -51,12 +51,12 @@ export abstract class AggregateRoot<
           ? (propOrPropUpdater as PropUpdater)(this)
           : propOrPropUpdater;
       const key = partialPropsOrKeyOrUpdater as K;
-      return this.withAggregateProps({ [key]: newPropValue } as any);
+      return this.withAggregateProps_({ [key]: newPropValue } as any);
     }
 
     return typeof partialPropsOrKeyOrUpdater === 'function'
-      ? this.withAggregateProps(partialPropsOrKeyOrUpdater(this) as Partial<T>)
-      : this.withAggregateProps(partialPropsOrKeyOrUpdater as Partial<T>);
+      ? this.withAggregateProps_(partialPropsOrKeyOrUpdater(this) as Partial<T>)
+      : this.withAggregateProps_(partialPropsOrKeyOrUpdater as Partial<T>);
   }
 
   addEvent(event: DomainEvent): this {
@@ -87,7 +87,7 @@ export abstract class AggregateRoot<
     return this.cachedEvents;
   }
 
-  private withAggregateProps(partialProps: Partial<T>): this {
+  private withAggregateProps_(partialProps: Partial<T>): this {
     let newImmutableProps = this.immutableProps;
     for (const key in partialProps) {
       const value = partialProps[key] as any;

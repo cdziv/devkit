@@ -8,15 +8,15 @@
 
 ## 快速起步
 
+在這個章節中，我們將在使用這個函式庫的核心功能，在領域層實作一個簡單的撲克遊戲範例。
+
 ### 安裝
 
 ```bash
 npm install @cdziv/devkit-ddd
 ```
 
-### 建構一個卡牌遊戲範例
-
-#### 建立值物件
+### 建立值物件
 
 首先，玩家需要一個使用者名稱、籌碼堆餘額。我們將使用者名稱設計為一個值物件：
 
@@ -68,7 +68,7 @@ expect(displayName.value).toEqual({
 expect(displayName.fullName).toBe('John Mayer');
 ```
 
-請注意，我們將所有領域物件設計為不可變的，所以 withMutations 會返回一個全新的值物件而不是自身。這讓領域物件的實體永遠符合領域不變量，實例化的過程會呼叫 validate 方法，只要您能成功建立該物件——不論是創建、持久還原、還是透過 withMutations——您必須維護其領域不變性，否則，就應該拋出錯誤。
+請注意，我們將所有領域物件設計為不可變的，所以 evolve 會返回一個全新的值物件而不是自身。這讓領域物件的實體永遠符合領域不變量，實例化的過程會呼叫 validate 方法，只要您能成功建立該物件——不論是創建、持久還原、還是透過 withMutations——您必須維護其領域不變性，否則，就應該拋出錯誤。
 
 您可以使用 equals 方法來比對兩個值物件的值是否相等：
 
@@ -138,7 +138,7 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   fold() {
     const event = new PlayerFolded(this.id.rawId);
-    return this.withMutations('folded', true).addEvent(event);
+    return this.evolve('folded', true).addEvent(event);
   }
 
   check() {
@@ -148,7 +148,7 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   raise(count: ChipCount) {
     const event = new PlayerRaised(this.id.rawId);
-    return this.withMutations('stack', stack.raise(count)).addEvent(event);
+    return this.evolve('stack', stack.raise(count)).addEvent(event);
   }
 
   // ... 實作內容 ...

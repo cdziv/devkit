@@ -36,7 +36,7 @@ export abstract class AggregateRoot<
       : List(eventsOrImmutableEvents ?? []);
   }
 
-  override withMutations<
+  override evolve<
     K extends keyof T,
     V extends T[K],
     PropUpdater extends (entity: this) => V,

@@ -210,7 +210,7 @@ describe('ValueObject', () => {
     });
   });
 
-  describe('withMutations', () => {
+  describe('evolve', () => {
     class NumberChild extends ValueObject<number> {
       validate(value: number): ValidationResult {
         if (typeof value !== 'number') return false;
@@ -220,7 +220,7 @@ describe('ValueObject', () => {
 
     it('should return a new instance with new primitive value', () => {
       const vo = new NumberChild(123);
-      const newVo = vo.withMutations(456);
+      const newVo = vo.evolve(456);
 
       expect(newVo).not.toBe(vo);
       expect(newVo.value).toBe(456);
@@ -228,35 +228,35 @@ describe('ValueObject', () => {
 
     it('should return a new instance with new primitive value by updater', () => {
       const vo = new NumberChild(123);
-      const newVo = vo.withMutations((vo) => vo.value + 1);
+      const newVo = vo.evolve((vo) => vo.value + 1);
 
       expect(newVo.value).toBe(124);
     });
 
     it('should return a new instance with new object value merged from partial value', () => {
       const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.withMutations({ name: 'bar' });
+      const newVo = vo.evolve({ name: 'bar' });
 
       expect(newVo.value).toEqual({ name: 'bar', age: 123 });
     });
 
     it('should return a new instance with new object value merged from partial value by updater', () => {
       const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.withMutations((vo) => ({ age: vo.value.age + 1 }));
+      const newVo = vo.evolve((vo) => ({ age: vo.value.age + 1 }));
 
       expect(newVo.value).toEqual({ name: 'foo', age: 124 });
     });
 
     it('should return a new instance with new object value by key and value', () => {
       const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.withMutations('name', 'bar');
+      const newVo = vo.evolve('name', 'bar');
 
       expect(newVo.value).toEqual({ name: 'bar', age: 123 });
     });
 
     it('should return a new instance with new object value by key and updater', () => {
       const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.withMutations('age', (vo) => vo.value.age + 1);
+      const newVo = vo.evolve('age', (vo) => vo.value.age + 1);
 
       expect(newVo.value).toEqual({ name: 'foo', age: 124 });
     });
@@ -271,7 +271,7 @@ describe('ValueObject', () => {
         },
         nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
       });
-      const newVo = vo.withMutations({
+      const newVo = vo.evolve({
         nestedObj: { firstName: 'newBar' } as any,
         nestedVO: new ObjectVO({ name: 'newNested', age: 789 }),
       });

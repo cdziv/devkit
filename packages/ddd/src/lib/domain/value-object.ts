@@ -45,20 +45,18 @@ export abstract class ValueObject<
     return isDeepStrictEqual(this.value, vo.value);
   }
 
-  withMutations(value: T extends DomainPrimitive ? T : Partial<T>): this;
-  withMutations<K extends ValueObjectValueKeys<T>, V extends T[K]>(
+  evolve(value: T extends DomainPrimitive ? T : Partial<T>): this;
+  evolve<K extends ValueObjectValueKeys<T>, V extends T[K]>(
     key: K,
     value: V
   ): this;
-  withMutations<
+  evolve<
     K extends keyof T,
     V extends T[K],
     PropUpdater extends (vo: this) => V
   >(key: K, propUpdater: PropUpdater): this;
-  withMutations(
-    updater: (vo: this) => PrimitiveValue<T> | PartialValue<T>
-  ): this;
-  withMutations<
+  evolve(updater: (vo: this) => PrimitiveValue<T> | PartialValue<T>): this;
+  evolve<
     K extends ValueObjectValueKeys<T>,
     V extends T[K],
     PropUpdater extends (vo: this) => V,
@@ -71,7 +69,7 @@ export abstract class ValueObject<
       | K,
     propOrPropUpdater?: V | PropUpdater
   ): this;
-  withMutations<
+  evolve<
     K extends ValueObjectValueKeys<T>,
     V extends T[K],
     PropUpdater extends (vo: this) => V,

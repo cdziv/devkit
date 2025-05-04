@@ -46,15 +46,15 @@ export abstract class Entity<
     return this.id.equals(entity.id);
   }
 
-  withMutations(props: Partial<T>): this;
-  withMutations<K extends keyof T, V extends T[K]>(key: K, value: V): this;
-  withMutations<
+  evolve(props: Partial<T>): this;
+  evolve<K extends keyof T, V extends T[K]>(key: K, value: V): this;
+  evolve<
     K extends keyof T,
     V extends T[K],
     PropUpdater extends (entity: this) => V
   >(key: K, propUpdater: PropUpdater): this;
-  withMutations(updater: (entity: this) => Partial<T>): this;
-  withMutations<
+  evolve(updater: (entity: this) => Partial<T>): this;
+  evolve<
     K extends keyof T,
     V extends T[K],
     PropUpdater extends (entity: this) => V,
@@ -63,7 +63,7 @@ export abstract class Entity<
     partialPropsOrKeyOrUpdater: Partial<T> | Updater | K,
     propOrPropUpdater?: V | PropUpdater
   ): this;
-  withMutations<
+  evolve<
     K extends keyof T,
     V extends T[K],
     PropUpdater extends (entity: this) => V,

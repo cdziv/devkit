@@ -1,20 +1,20 @@
-English | [繁體中文](./README.zh-TW.md)
+[English](./README.md) | 繁體中文
 
-# Introduction
+# 介紹
 
-This is a simple library to help you create modular errors.
+這是一個簡單的函式庫幫助您創建模組化的錯誤。
 
-## Quick Start
+## 快速起步
 
-### Installation
+### 安裝
 
 ```bash
 npm install @cdziv/devkit-error
 ```
 
-### Error Code Table
+### 錯誤代碼表
 
-Use `createErrorCodes` to easily create an error code table:
+使用 `createErrorCodes` 可以方便地建立錯誤代碼表：
 
 ```ts
 import { createErrorCodes } from '@cdziv/devkit-error';
@@ -35,7 +35,7 @@ expect(AUTH_ERROR_CODES).toEqual({
 });
 ```
 
-You can also use key-value pairs as the source:
+您也可以使用鍵值對當作 source：
 
 ```ts
 const source = {
@@ -54,11 +54,11 @@ expect(AUTH_ERROR_CODES).toEqual({
 });
 ```
 
-### Errors with Error Codes
+### 帶有錯誤碼的錯誤
 
 ```ts
 import { ErrorWithCode, Values } from '@cdziv/devkit-error';
-import { AUTH_ERROR_CODES } from '../error-codes'; // The error code table created earlier
+import { AUTH_ERROR_CODES } from '../error-codes'; // 剛剛建立的錯誤代碼表
 
 abstract class AuthError extends ErrorWithCode {
   abstract readonly code: Values<typeof AUTH_ERROR_CODES>;

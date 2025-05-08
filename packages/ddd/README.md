@@ -1,4 +1,4 @@
-English | [繁體中文](./README.zh-TW.md)
+English | [繁體中文](https://github.com/cdziv/devkit/blob/main/packages/ddd/README.zh-tw.md)
 
 # Introduction
 

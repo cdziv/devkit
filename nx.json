@@ -60,7 +60,10 @@
   },
   "release": {
     "version": {
-      "preVersionCommand": "pnpm exec nx affected --target=build"
+      "preVersionCommand": "npx nx run-many -t build",
+      "generatorOptions": {
+        "skipLockFileUpdate": true
+      }
     },
     "projectsRelationship": "independent"
   }

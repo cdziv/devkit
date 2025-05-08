@@ -31,9 +31,5 @@
     "verdaccio": "^6.0.5",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
-  },
-  "dependencies": {
-    "@cdziv/devkit-error": "0.1.5",
-    "type-fest": "^4.40.0"
   }
 }

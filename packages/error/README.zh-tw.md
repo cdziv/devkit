@@ -1,4 +1,4 @@
-[English](./README.md) | 繁體中文
+[English](https://github.com/cdziv/devkit/blob/main/packages/error/README.md) | 繁體中文
 
 # 介紹
 

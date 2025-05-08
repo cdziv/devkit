@@ -1,6 +1,6 @@
 {
   "name": "@devkit/source",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "update-git-hooks": "npx simple-git-hooks"
@@ -33,7 +33,7 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
-    "@cdziv/devkit-error": "0.1.4",
+    "@cdziv/devkit-error": "0.1.5",
     "type-fest": "^4.40.0"
   }
 }

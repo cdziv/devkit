@@ -1,6 +1,6 @@
 {
   "name": "@cdziv/devkit-ddd",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publishConfig": {
     "access": "public"
   },
@@ -19,6 +19,6 @@
     "type-fest": "^4.40.0"
   },
   "devDependencies": {
-    "@cdziv/devkit-error": "workspace:*"
+    "@cdziv/devkit-error": "0.1.5"
   }
 }

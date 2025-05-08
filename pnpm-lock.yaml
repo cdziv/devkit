@@ -83,16 +83,15 @@ importers:
 
   packages/ddd:
     dependencies:
+      '@cdziv/devkit-error':
+        specifier: 0.1.6
+        version: 0.1.6
       immutable:
         specifier: ^5.1.1
         version: 5.1.1
       type-fest:
         specifier: ^4.40.0
         version: 4.40.0
-    devDependencies:
-      '@cdziv/devkit-error':
-        specifier: 0.1.5
-        version: 0.1.5
 
   packages/ddd/dist:
     dependencies:
@@ -650,6 +649,9 @@ packages:
 
   '@cdziv/devkit-error@0.1.5':
     resolution: {integrity: sha512-q0p8wYq4wKGtqTYpWXDqoLsAclpz+wDGBsTj+9rGnTLzsGSGY467q7M2hASxIWr5wtEn5KLjX+z6uJ7Tvme0oA==}
+
+  '@cdziv/devkit-error@0.1.6':
+    resolution: {integrity: sha512-2dmmOWXefwr+Yate+HGEMqDTkox1Fj39cChJavCkhk4OMAOa9mjc6NqEIHW/vh0UIaVLLTSYaXXt/5gEJaicMw==}
 
   '@cypress/request@3.0.8':
     resolution: {integrity: sha512-h0NFgh1mJmm1nr4jCwkGHwKneVYKghUyWe6TMNrk0B9zsjAJxpg8C4/+BAcmLgCPa1vj1V8rNUaILl+zYRUWBQ==}
@@ -4376,6 +4378,8 @@ snapshots:
   '@bcoe/v8-coverage@1.0.2': {}
 
   '@cdziv/devkit-error@0.1.5': {}
+
+  '@cdziv/devkit-error@0.1.6': {}
 
   '@cypress/request@3.0.8':
     dependencies:

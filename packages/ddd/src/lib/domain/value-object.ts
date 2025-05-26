@@ -184,15 +184,17 @@ export abstract class ValueObject<
  * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
  * so `type` must be used instead. If a better solution is found, this part should be revised.
  */
-export type ValueObjectValue =
-  | DomainPrimitive
-  | Record<
-      string,
-      | DomainPrimitive
-      | DomainPrimitive[]
-      | DomainPrimitiveObject
-      | ValueObject<any>
-    >;
+export type ValueObjectValue = DomainPrimitive | ValueObjectValueObject;
+type ValueObjectValueObject = {
+  [key: string]:
+    | DomainPrimitive
+    | DomainPrimitive[]
+    | DomainPrimitiveObject
+    | DomainPrimitiveObject[]
+    | ValueObject<any>
+    | ValueObject<any>[]
+    | ValueObjectValueObject;
+};
 type PrimitiveValue<T extends ValueObjectValue> = T extends DomainPrimitive
   ? T
   : never;

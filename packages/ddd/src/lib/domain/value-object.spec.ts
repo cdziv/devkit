@@ -23,11 +23,16 @@ describe('ValueObject', () => {
   type NestedObjectValue = {
     name: string;
     age: number;
-    nestedObj: {
+    complexObj: {
       firstName: string;
       lastName: string;
+      nestedObj: {
+        prop: string;
+        vo: ObjectVO;
+      };
     };
-    nestedVO: ObjectVO;
+    vo: ObjectVO;
+    voArr: ObjectVO[];
   };
   class NestedObjectVO extends ValueObject<NestedObjectValue> {
     validate(): ValidationResult {
@@ -47,11 +52,16 @@ describe('ValueObject', () => {
         new NestedObjectVO({
           name: 'foo',
           age: 123,
-          nestedObj: {
+          complexObj: {
             firstName: 'bar',
             lastName: 'baz',
+            nestedObj: {
+              prop: 'nestedProp',
+              vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+            },
           },
-          nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+          vo: new ObjectVO({ name: 'voName', age: 789 }),
+          voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
         })
       ).toBeInstanceOf(NestedObjectVO);
     });
@@ -119,20 +129,30 @@ describe('ValueObject', () => {
       const vo1 = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
       const vo2 = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
       expect(vo1.equals(vo2)).toBe(true);
     });
@@ -265,24 +285,41 @@ describe('ValueObject', () => {
       const vo = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
       const newVo = vo.evolve({
-        nestedObj: { firstName: 'newBar' } as any,
-        nestedVO: new ObjectVO({ name: 'newNested', age: 789 }),
+        complexObj: {
+          firstName: 'newBar',
+          nestedObj: {
+            prop: 'newNestedProp',
+            vo: new ObjectVO({ name: 'newNestedVOName', age: 654 }),
+          },
+        } as any,
+        vo: new ObjectVO({ name: 'newVoName', age: 999 }),
+        voArr: [new ObjectVO({ name: 'newVoArrName', age: 888 })],
       });
 
       expect(newVo.value).toEqual({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'newBar',
+          nestedObj: {
+            prop: 'newNestedProp',
+            vo: new ObjectVO({ name: 'newNestedVOName', age: 654 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'newNested', age: 789 }),
+        vo: new ObjectVO({ name: 'newVoName', age: 999 }),
+        voArr: [new ObjectVO({ name: 'newVoArrName', age: 888 })],
       });
     });
   });
@@ -302,20 +339,30 @@ describe('ValueObject', () => {
       const vo = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
       expect(vo.toJSON()).toEqual({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: { name: 'nestedVOName', age: 321 },
+          },
         },
-        nestedVO: { name: 'nested', age: 456 },
+        vo: { name: 'voName', age: 789 },
+        voArr: [{ name: 'voArrName', age: 456 }],
       });
     });
   });
@@ -347,29 +394,39 @@ describe('ValueObject', () => {
       const vo = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
       expect(Object.isFrozen(vo.value)).toBe(true);
-      expect(Object.isFrozen(vo.value.nestedObj)).toBe(true);
+      expect(Object.isFrozen(vo.value.complexObj)).toBe(true);
+      expect(Object.isFrozen(vo.value.complexObj.nestedObj)).toBe(true);
     });
 
     it('should return nestedVO prop with original value object', () => {
-      const nestedVO = new ObjectVO({ name: 'nested', age: 456 });
       const vo = new NestedObjectVO({
         name: 'foo',
         age: 123,
-        nestedObj: {
+        complexObj: {
           firstName: 'bar',
           lastName: 'baz',
+          nestedObj: {
+            prop: 'nestedProp',
+            vo: new ObjectVO({ name: 'nestedVOName', age: 321 }),
+          },
         },
-        nestedVO,
+        vo: new ObjectVO({ name: 'voName', age: 789 }),
+        voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
-      expect(vo.value.nestedVO).toBeInstanceOf(ObjectVO);
-      expect(vo.value.nestedVO).toBe(nestedVO);
+      expect(vo.value.vo).toBeInstanceOf(ObjectVO);
+      expect(vo.value.voArr[0]).toBeInstanceOf(ObjectVO);
     });
   });
 });

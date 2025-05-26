@@ -246,42 +246,16 @@ describe('ValueObject', () => {
       expect(newVo.value).toBe(456);
     });
 
-    it('should return a new instance with new primitive value by updater', () => {
-      const vo = new NumberChild(123);
-      const newVo = vo.evolve((vo) => vo.value + 1);
-
-      expect(newVo.value).toBe(124);
-    });
-
-    it('should return a new instance with new object value merged from partial value', () => {
+    it('should return a new instance with new object value by recipe function', () => {
       const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.evolve({ name: 'bar' });
+      const newVo = vo.evolve((draft) => {
+        draft.name = 'bar';
+      });
 
       expect(newVo.value).toEqual({ name: 'bar', age: 123 });
     });
 
-    it('should return a new instance with new object value merged from partial value by updater', () => {
-      const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.evolve((vo) => ({ age: vo.value.age + 1 }));
-
-      expect(newVo.value).toEqual({ name: 'foo', age: 124 });
-    });
-
-    it('should return a new instance with new object value by key and value', () => {
-      const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.evolve('name', 'bar');
-
-      expect(newVo.value).toEqual({ name: 'bar', age: 123 });
-    });
-
-    it('should return a new instance with new object value by key and updater', () => {
-      const vo = new ObjectVO({ name: 'foo', age: 123 });
-      const newVo = vo.evolve('age', (vo) => vo.value.age + 1);
-
-      expect(newVo.value).toEqual({ name: 'foo', age: 124 });
-    });
-
-    it('should return a new instance with replaced top level props from partial value', () => {
+    it('should return a new instance with changed props in recipe', () => {
       const vo = new NestedObjectVO({
         name: 'foo',
         age: 123,
@@ -296,16 +270,15 @@ describe('ValueObject', () => {
         vo: new ObjectVO({ name: 'voName', age: 789 }),
         voArr: [new ObjectVO({ name: 'voArrName', age: 456 })],
       });
-      const newVo = vo.evolve({
-        complexObj: {
-          firstName: 'newBar',
-          nestedObj: {
-            prop: 'newNestedProp',
-            vo: new ObjectVO({ name: 'newNestedVOName', age: 654 }),
-          },
-        } as any,
-        vo: new ObjectVO({ name: 'newVoName', age: 999 }),
-        voArr: [new ObjectVO({ name: 'newVoArrName', age: 888 })],
+      const newVo = vo.evolve((draft) => {
+        draft.complexObj.firstName = 'newBar';
+        draft.complexObj.nestedObj.prop = 'newNestedProp';
+        draft.complexObj.nestedObj.vo = new ObjectVO({
+          name: 'newNestedVOName',
+          age: 654,
+        });
+        draft.vo = new ObjectVO({ name: 'newVoName', age: 999 });
+        draft.voArr = [new ObjectVO({ name: 'newVoArrName', age: 888 })];
       });
 
       expect(newVo.value).toEqual({
@@ -313,6 +286,7 @@ describe('ValueObject', () => {
         age: 123,
         complexObj: {
           firstName: 'newBar',
+          lastName: 'baz',
           nestedObj: {
             prop: 'newNestedProp',
             vo: new ObjectVO({ name: 'newNestedVOName', age: 654 }),

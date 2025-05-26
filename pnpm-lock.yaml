@@ -86,25 +86,24 @@ importers:
       '@cdziv/devkit-error':
         specifier: 0.1.6
         version: 0.1.6
-      immutable:
-        specifier: ^5.1.1
-        version: 5.1.1
+      immer:
+        specifier: ^10.1.1
+        version: 10.1.1
       type-fest:
         specifier: ^4.40.0
         version: 4.40.0
 
   packages/ddd/dist:
     dependencies:
+      '@cdziv/devkit-error':
+        specifier: 0.1.6
+        version: 0.1.6
       immutable:
         specifier: ^5.1.1
         version: 5.1.1
       type-fest:
         specifier: ^4.40.0
         version: 4.40.0
-    devDependencies:
-      '@cdziv/devkit-error':
-        specifier: 0.1.5
-        version: 0.1.5
 
   packages/error: {}
 
@@ -646,9 +645,6 @@ packages:
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
-
-  '@cdziv/devkit-error@0.1.5':
-    resolution: {integrity: sha512-q0p8wYq4wKGtqTYpWXDqoLsAclpz+wDGBsTj+9rGnTLzsGSGY467q7M2hASxIWr5wtEn5KLjX+z6uJ7Tvme0oA==}
 
   '@cdziv/devkit-error@0.1.6':
     resolution: {integrity: sha512-2dmmOWXefwr+Yate+HGEMqDTkox1Fj39cChJavCkhk4OMAOa9mjc6NqEIHW/vh0UIaVLLTSYaXXt/5gEJaicMw==}
@@ -2427,6 +2423,9 @@ packages:
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
+
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   immutable@5.1.1:
     resolution: {integrity: sha512-3jatXi9ObIsPGr3N5hGw/vWWcTkq6hUYhpQz4k0wLC+owqWi/LiugIw9x0EdNZ2yGedKN/HzePiBvaJRXa0Ujg==}
@@ -4377,8 +4376,6 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@cdziv/devkit-error@0.1.5': {}
-
   '@cdziv/devkit-error@0.1.6': {}
 
   '@cypress/request@3.0.8':
@@ -6283,6 +6280,8 @@ snapshots:
   ieee754@1.2.1: {}
 
   ignore@5.3.2: {}
+
+  immer@10.1.1: {}
 
   immutable@5.1.1: {}
 

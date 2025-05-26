@@ -4,7 +4,6 @@ import { ArgumentInvalidError } from '../errors';
 import { Entity } from './entity';
 import { ValueObject } from './value-object';
 import { EntityId } from './entity-id';
-import { Map } from 'immutable';
 
 describe('Entity', () => {
   type ObjectVOValue = {
@@ -85,57 +84,12 @@ describe('Entity', () => {
       ).toBeInstanceOf(ComplexEntity);
     });
 
-    it('should create an instance when valid immutable props', () => {
-      expect(
-        new SimpleEntity(
-          Map({
-            name: 'foo',
-            age: 123,
-          })
-        )
-      ).toBeInstanceOf(SimpleEntity);
-      expect(
-        new ComplexEntity(
-          Map({
-            id: new Id('complex-entity-id'),
-            name: 'foo',
-            age: 123,
-            nestedObj: {
-              firstName: 'bar',
-              lastName: 'baz',
-            },
-            nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-            nestedEntity: new SimpleEntity({
-              name: 'nested-entity',
-              age: 456,
-            }),
-          })
-        )
-      ).toBeInstanceOf(ComplexEntity);
-    });
-
     it('should call validateProps_ method with the passed props', () => {
       const spy = vi.spyOn(SimpleEntity.prototype, 'validate');
       new SimpleEntity({
         name: 'foo',
         age: 123,
       });
-      expect(spy).toHaveBeenCalledWith({
-        name: 'foo',
-        age: 123,
-      });
-      expect(spy).toHaveBeenCalledTimes(1);
-      spy.mockRestore();
-    });
-
-    it('should call validateProps_ method with the props of passed immutable props', () => {
-      const spy = vi.spyOn(SimpleEntity.prototype, 'validate');
-      new SimpleEntity(
-        Map({
-          name: 'foo',
-          age: 123,
-        })
-      );
       expect(spy).toHaveBeenCalledWith({
         name: 'foo',
         age: 123,
@@ -276,7 +230,7 @@ describe('Entity', () => {
   });
 
   describe('evolve', () => {
-    it('should return a new instance with updated prop', () => {
+    it('should return a new instance with recipe function', () => {
       const entity = new ComplexEntity({
         id: new Id('complex-entity-id'),
         name: 'foo',
@@ -291,8 +245,8 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.evolve({
-        name: 'bar',
+      const updated = entity.evolve((draft) => {
+        draft.name = 'bar';
       });
 
       expect(updated).not.toBe(entity);
@@ -312,111 +266,7 @@ describe('Entity', () => {
       });
     });
 
-    it('should return a new instance with updated prop by updater', () => {
-      const entity = new ComplexEntity({
-        id: new Id('complex-entity-id'),
-        name: 'foo',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-      const updated = entity.evolve((entity) => ({
-        name: entity.props.name + 'bar',
-      }));
-
-      expect(updated).not.toBe(entity);
-      expect(updated.props).toEqual({
-        id: new Id('complex-entity-id'),
-        name: 'foobar',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-    });
-
-    it('should return a new instance with new props by key and value', () => {
-      const entity = new ComplexEntity({
-        id: new Id('complex-entity-id'),
-        name: 'foo',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-      const updated = entity.evolve('name', 'bar');
-
-      expect(updated).not.toBe(entity);
-      expect(updated.props).toEqual({
-        id: new Id('complex-entity-id'),
-        name: 'bar',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-    });
-
-    it('should return a new instance with new props by key and updater', () => {
-      const entity = new ComplexEntity({
-        id: new Id('complex-entity-id'),
-        name: 'foo',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-      const updated = entity.evolve('name', 'bar');
-
-      expect(updated).not.toBe(entity);
-      expect(updated.props).toEqual({
-        id: new Id('complex-entity-id'),
-        name: 'bar',
-        age: 123,
-        nestedObj: {
-          firstName: 'bar',
-          lastName: 'baz',
-        },
-        nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
-        nestedEntity: new SimpleEntity({
-          name: 'nested-entity',
-          age: 456,
-        }),
-      });
-    });
-
-    it('should return a new instance with only replaced top level props from partial value', () => {
+    it('should return a new instance with nested props by recipe function', () => {
       const entity = new ComplexEntity({
         id: new Id('complex-entity-id'),
         name: 'foo',
@@ -431,10 +281,8 @@ describe('Entity', () => {
           age: 456,
         }),
       });
-      const updated = entity.evolve({
-        nestedObj: {
-          firstName: 'bar',
-        },
+      const updated = entity.evolve((draft) => {
+        draft.nestedObj.firstName = 'bar';
       });
 
       expect(updated).not.toBe(entity);
@@ -444,6 +292,7 @@ describe('Entity', () => {
         age: 123,
         nestedObj: {
           firstName: 'bar',
+          lastName: 'baz',
         },
         nestedVO: new ObjectVO({ name: 'nested', age: 456 }),
         nestedEntity: new SimpleEntity({

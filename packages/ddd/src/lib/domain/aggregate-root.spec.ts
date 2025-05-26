@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { DomainEventEmitter, ValidationResult } from '../interfaces';
 import { EntityId } from './entity-id';
-import { List, Map } from 'immutable';
 import { AggregateRoot } from './aggregate-root';
 import { DomainEvent } from './domain-event';
 
@@ -60,38 +59,10 @@ describe('AggregateRoot', () => {
       expect(aggregate).toBeInstanceOf(TestAggregate);
       expect(aggregate.events).toEqual(events);
     });
-
-    it('should create an instance when valid immutable props', () => {
-      expect(
-        new TestAggregate(
-          Map({
-            name: 'foo',
-            age: 123,
-          })
-        )
-      ).toBeInstanceOf(TestAggregate);
-    });
-
-    it('should create an instance when valid immutable props and immutable events', () => {
-      const immutableEvents = List([
-        new TestDomainEvent('aggregate-id'),
-        new TestDomainEvent('aggregate-id'),
-      ]);
-      const aggregate = new TestAggregate(
-        Map({
-          name: 'foo',
-          age: 123,
-        }),
-        immutableEvents
-      );
-
-      expect(aggregate).toBeInstanceOf(TestAggregate);
-      expect(aggregate.events).toEqual(immutableEvents.toArray());
-    });
   });
 
   describe('evolve', () => {
-    it('should return a new instance with updated prop and existed events', () => {
+    it('should return a new instance with recipe function', () => {
       const events = [
         new TestDomainEvent('aggregate-id'),
         new TestDomainEvent('aggregate-id'),
@@ -103,8 +74,8 @@ describe('AggregateRoot', () => {
         },
         events
       );
-      const updated = original.evolve({
-        name: 'bar',
+      const updated = original.evolve((draft) => {
+        draft.name = 'bar';
       });
 
       expect(updated).not.toBe(original);

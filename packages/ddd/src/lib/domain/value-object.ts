@@ -12,33 +12,23 @@ import { ArgumentInvalidError } from '../errors';
 import { deepJsonify, isDomainPrimitive } from '../utils';
 import { handleValidationResult } from '../helpers';
 import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
-import { Map, MapOf, isMap } from 'immutable';
 import { Constructor } from 'type-fest';
+import { produce, WritableDraft } from 'immer';
 
 export abstract class ValueObject<
   T extends ValueObjectValue,
   J extends JsonValue = JsonifyDeep<T>
 > extends DomainObject<J> {
   public readonly isDomainPrimitive: boolean;
-  private readonly map: ImmutableValueObjectMap<T>;
+  private readonly props: ValueObjectProps<T>;
   private cachedProps?: ReadonlyDomainObjectProps<ValueObjectProps<T>>;
 
-  constructor(valueOrImmutableMap: T | ImmutableValueObjectMap<T>) {
+  constructor(value: T) {
     super();
 
-    const isImmutableMap = isMap(valueOrImmutableMap);
-    const value = isImmutableMap
-      ? this.getValue_(
-          (
-            valueOrImmutableMap as ImmutableValueObjectMap<T>
-          ).toJSON() as ValueObjectProps<T>
-        )
-      : (valueOrImmutableMap as T);
     this.validateValue_(value);
     this.isDomainPrimitive = isDomainPrimitive(value);
-    this.map = isImmutableMap
-      ? valueOrImmutableMap
-      : Map(this.getProps_(value));
+    this.props = this.getProps_(value);
   }
 
   protected abstract validate(props: T): ValidationResult;
@@ -47,90 +37,16 @@ export abstract class ValueObject<
     return isDeepStrictEqual(this.value, vo.value);
   }
 
-  evolve(value: T extends DomainPrimitive ? T : Partial<T>): this;
-  evolve<K extends ValueObjectValueKeys<T>, V extends T[K]>(
-    key: K,
-    value: V
-  ): this;
-  evolve<
-    K extends keyof T,
-    V extends T[K],
-    PropUpdater extends (vo: this) => V
-  >(key: K, propUpdater: PropUpdater): this;
-  evolve(updater: (vo: this) => PrimitiveValue<T> | PartialValue<T>): this;
-  evolve<
-    K extends ValueObjectValueKeys<T>,
-    V extends T[K],
-    PropUpdater extends (vo: this) => V,
-    Updater extends (vo: this) => PrimitiveValue<T> | PartialValue<T>
-  >(
-    primitiveValueOrPartialValueOrKeyOrUpdater:
-      | PrimitiveValue<T>
-      | Updater
-      | PartialValue<T>
-      | K,
-    propOrPropUpdater?: V | PropUpdater
-  ): this;
-  evolve<
-    K extends ValueObjectValueKeys<T>,
-    V extends T[K],
-    PropUpdater extends (vo: this) => V,
-    Updater extends (vo: this) => PrimitiveValue<T> | PartialValue<T>
-  >(
-    primitiveValueOrPartialValueOrKeyOrUpdater:
-      | PrimitiveValue<T>
-      | Updater
-      | PartialValue<T>
-      | K,
-    propOrPropUpdater?: V | PropUpdater
-  ) {
-    if (propOrPropUpdater !== undefined) {
-      const newPropValue =
-        typeof propOrPropUpdater === 'function'
-          ? (propOrPropUpdater as PropUpdater)(this)
-          : propOrPropUpdater;
-      const key = primitiveValueOrPartialValueOrKeyOrUpdater as K;
-      return this.withProps_({ [key]: newPropValue } as any);
-    }
-
+  evolve<R extends (draft: WritableDraft<T>) => void>(
+    valueOrRecipe: T extends DomainPrimitive ? T : R
+  ): this {
     if (this.isDomainPrimitive) {
-      return typeof primitiveValueOrPartialValueOrKeyOrUpdater === 'function'
-        ? this.withDomainPrimitiveValue_(
-            primitiveValueOrPartialValueOrKeyOrUpdater(
-              this
-            ) as PrimitiveValue<T>
-          )
-        : this.withDomainPrimitiveValue_(
-            primitiveValueOrPartialValueOrKeyOrUpdater as PrimitiveValue<T>
-          );
+      return new (this.constructor as Constructor<this>)(valueOrRecipe as T);
     }
 
-    return typeof primitiveValueOrPartialValueOrKeyOrUpdater === 'function'
-      ? this.withProps_(
-          primitiveValueOrPartialValueOrKeyOrUpdater(this) as PartialValue<T>
-        )
-      : this.withProps_(
-          primitiveValueOrPartialValueOrKeyOrUpdater as PartialValue<T>
-        );
-  }
-  private withDomainPrimitiveValue_(
-    value: T extends DomainPrimitive ? T : never
-  ): this {
-    return new (this.constructor as Constructor<this>)(value);
-  }
-  private withProps_(
-    partialProps: T extends DomainPrimitive ? never : Partial<T>
-  ): this {
-    let newMap = this.map;
-    for (const key in partialProps) {
-      const value = partialProps[key] as any;
-      if (value === undefined) {
-        newMap = newMap.delete(key as keyof ValueObjectProps<T>);
-      } else {
-        newMap = newMap.set(key as keyof ValueObjectProps<T>, value);
-      }
-    }
-    return new (this.constructor as Constructor<this>)(newMap);
+    return new (this.constructor as Constructor<this>)(
+      produce(this.props, valueOrRecipe as R)
+    );
   }
 
   toJSON(): J {
@@ -139,9 +55,7 @@ export abstract class ValueObject<
 
   get value(): ReadonlyDomainObjectProps<T> {
     if (!this.cachedProps) {
-      this.cachedProps = DomainObject.convertPropsToReadonly(
-        this.map.toJSON() as ValueObjectProps<T>
-      );
+      this.cachedProps = DomainObject.convertPropsToReadonly(this.props);
     }
     return this.getValue_(this.cachedProps);
   }
@@ -185,7 +99,7 @@ export abstract class ValueObject<
  * so `type` must be used instead. If a better solution is found, this part should be revised.
  */
 export type ValueObjectValue = DomainPrimitive | ValueObjectValueObject;
-type ValueObjectValueObject = {
+interface ValueObjectValueObject {
   [key: string]:
     | DomainPrimitive
     | DomainPrimitive[]
@@ -194,19 +108,9 @@ type ValueObjectValueObject = {
     | ValueObject<any>
     | ValueObject<any>[]
     | ValueObjectValueObject;
-};
-type PrimitiveValue<T extends ValueObjectValue> = T extends DomainPrimitive
-  ? T
-  : never;
-type PartialValue<T extends ValueObjectValue> = T extends DomainPrimitive
-  ? never
-  : Partial<T>;
-type ValueObjectValueKeys<T extends ValueObjectValue> =
-  T extends DomainPrimitive ? never : keyof T;
+}
+
 type WrappedPrimitive<T> = { value: T };
 type ValueObjectProps<T extends ValueObjectValue> = T extends DomainPrimitive
   ? WrappedPrimitive<T>
   : T;
-type ImmutableValueObjectMap<T extends ValueObjectValue> = MapOf<
-  ValueObjectProps<T>
->;

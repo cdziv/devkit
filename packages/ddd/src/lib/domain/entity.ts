@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Map, MapOf, isMap } from 'immutable';
 import {
   DomainPrimitive,
   DomainPrimitiveObject,
@@ -15,28 +14,20 @@ import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
 import { ValueObject, ValueObjectValue } from './value-object';
 import { EntityId } from './entity-id';
 import { Constructor } from 'type-fest';
+import { produce, WritableDraft } from 'immer';
 
 export abstract class Entity<
   T extends EntityProps,
   ID extends EntityId<ValueObjectValue> = EntityId<string>,
   J extends JsonValue = JsonifyDeep<T>
 > extends DomainObject<J> {
-  protected readonly immutableProps: ImmutableProps<T>;
   private cachedProps: ReadonlyDomainObjectProps<T>;
 
-  constructor(props: T);
-  constructor(immutableProps: ImmutableProps<T>);
-  constructor(propsOrImmutableProps: T | ImmutableProps<T>) {
+  constructor(props: T) {
     super();
 
-    const isImmutableProps = isMap(propsOrImmutableProps);
-    const props = isImmutableProps
-      ? (propsOrImmutableProps.toJSON() as T)
-      : propsOrImmutableProps;
     this.validateProps_(props);
-
     this.cachedProps = DomainObject.convertPropsToReadonly(props);
-    this.immutableProps = isImmutableProps ? propsOrImmutableProps : Map(props);
   }
 
   abstract get id(): ID;
@@ -46,57 +37,10 @@ export abstract class Entity<
     return this.id.equals(entity.id);
   }
 
-  evolve(props: Partial<T>): this;
-  evolve<K extends keyof T, V extends T[K]>(key: K, value: V): this;
-  evolve<
-    K extends keyof T,
-    V extends T[K],
-    PropUpdater extends (entity: this) => V
-  >(key: K, propUpdater: PropUpdater): this;
-  evolve(updater: (entity: this) => Partial<T>): this;
-  evolve<
-    K extends keyof T,
-    V extends T[K],
-    PropUpdater extends (entity: this) => V,
-    Updater extends (entity: this) => Partial<T>
-  >(
-    partialPropsOrKeyOrUpdater: Partial<T> | Updater | K,
-    propOrPropUpdater?: V | PropUpdater
-  ): this;
-  evolve<
-    K extends keyof T,
-    V extends T[K],
-    PropUpdater extends (entity: this) => V,
-    Updater extends (entity: this) => Partial<T>
-  >(
-    partialPropsOrKeyOrUpdater: Partial<T> | Updater | K,
-    propOrPropUpdater?: V | PropUpdater
-  ) {
-    if (propOrPropUpdater !== undefined) {
-      const newPropValue =
-        typeof propOrPropUpdater === 'function'
-          ? (propOrPropUpdater as PropUpdater)(this)
-          : propOrPropUpdater;
-      const key = partialPropsOrKeyOrUpdater as K;
-      return this.withEntityProps_({ [key]: newPropValue } as any);
-    }
-
-    return typeof partialPropsOrKeyOrUpdater === 'function'
-      ? this.withEntityProps_(partialPropsOrKeyOrUpdater(this) as Partial<T>)
-      : this.withEntityProps_(partialPropsOrKeyOrUpdater as Partial<T>);
-  }
-
-  private withEntityProps_(partialProps: Partial<T>): this {
-    let newImmutableProps = this.immutableProps;
-    for (const key in partialProps) {
-      const value = partialProps[key] as any;
-      if (value === undefined) {
-        newImmutableProps = newImmutableProps.delete(key as keyof T);
-      } else {
-        newImmutableProps = newImmutableProps.set(key as keyof T, value);
-      }
-    }
-    return new (this.constructor as Constructor<this>)(newImmutableProps);
+  evolve<R extends (draft: WritableDraft<T>) => void>(recipe: R): this {
+    return new (this.constructor as Constructor<this>)(
+      produce(this.props, recipe)
+    );
   }
 
   toJSON(): J {
@@ -134,4 +78,3 @@ export type EntityProps = Record<
   | ValueObject<any>
   | Entity<any>
 >;
-export type ImmutableProps<T extends EntityProps> = MapOf<T>;

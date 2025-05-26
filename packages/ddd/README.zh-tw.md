@@ -1,6 +1,8 @@
+# @cdziv/devkit-ddd
+
 [English](https://github.com/cdziv/devkit/blob/main/packages/ddd/README.md) | 繁體中文
 
-# 介紹
+## 介紹
 
 @cdziv/devkit-ddd 協助您在程式實作面實現領域驅動設計(DDD)，建構領域知識清晰、易讀、易維護、可擴展的應用。它不依賴任何框架、ORM，可以按需使用於您的應用中。
 
@@ -48,6 +50,8 @@ expect(() => new Username(invalidName)).toThrow(ArgumentInvalidError);
 
 接下來，我們將籌碼堆也設計為一個值物件。籌碼堆有餘額、下注數兩個屬性，我們使用 `ChipCount` 作為這兩個屬性的值，將領域不變量邏輯封裝在 `ChipCount` 中，所以我們不需要擔心它們是否為正整數。另外，我們也定義了一些行為使用了 `evolve` 更新它們的值：
 
+> **提示**： evolve 方法使用 [Immer](https://immerjs.github.io/immer/) 來實現更新機制，所以你會看到它接受像是 `(draft) => { draft.someProps = 'new value' }` 的參數。但對於值為 domain primitive 的值物件來說，你可以直接傳入 domain primitive value。
+
 ```ts
 type ChipCountValue = number;
 class ChipCount extends ValueObject<ChipCountValue> {
@@ -59,8 +63,7 @@ class ChipCount extends ValueObject<ChipCountValue> {
     if (count.value > this.value) {
       throw new DddError('Not enough chips');
     }
-    // Another usage of evolve
-    return this.evolve((originalValue) => originalValue - count.value);
+    return this.evolve(this.value - count.value);
   }
 
   validate(value: ChipCountValue): ValidationResult {
@@ -80,24 +83,24 @@ class Stack extends ValueObject<StackValue> {
     if (this.value.balance.value < count.value) {
       throw new DddError('Not enough balance');
     }
-    // Another usage of evolve
-    return this.evolve((originalValue) => ({
-      balance: originalValue.balance.subtract(count),
-      bet: originalValue.bet.add(count),
-    }));
+    // You should use recipe function when value is not domain primitive
+    return this.evolve((draft) => {
+      draft.balance = this.value.balance.subtract(count);
+      draft.bet = this.value.bet.add(count);
+    });
   }
 
   win(count: ChipCount): Stack {
-    // Another usage of evolve
-    return this.evolve({
-      balance: this.value.balance.add(count),
-      bet: new ChipCount(0),
+    return this.evolve((draft) => {
+      draft.balance = this.value.balance.add(count);
+      draft.bet = new ChipCount(0);
     });
   }
 
   pay(): Stack {
-    // Another usage of evolve
-    return this.evolve('bet', new ChipCount(0));
+    return this.evolve((draft) => {
+      draft.bet = new ChipCount(0);
+    });
   }
 
   validate(value: StackValue): ValidationResult {
@@ -152,7 +155,9 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
   }
 
   fold() {
-    return this.evolve('folded', true);
+    return this.evolve((draft) => {
+      draft.folded = true;
+    });
   }
 
   validate(props: PlayerProps): ValidationResult {
@@ -212,7 +217,9 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   fold() {
     const event = new PlayerFolded(this.id.rawId);
-    return this.evolve('folded', true).addEvent(event);
+    return this.evolve((draft) => {
+      draft.folded = true;
+    }).addEvent(event);
   }
 
   check() {
@@ -222,7 +229,9 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   raise(count: ChipCount) {
     const event = new PlayerRaised(this.id.rawId);
-    return this.evolve('stack', stack.raise(count)).addEvent(event);
+    return this.evolve((draft) => {
+      draft.stack = this.props.stack.raise(count);
+    }).addEvent(event);
   }
 
   // ... 實作內容 ...

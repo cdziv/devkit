@@ -1,14 +1,16 @@
+# @cdziv/devkit-ddd
+
 English | [繁體中文](https://github.com/cdziv/devkit/blob/main/packages/ddd/README.zh-tw.md)
 
-# Introduction
+## Introduction
 
-`@cdziv/devkit-ddd` assists you in implementing Domain-Driven Design (DDD) in your code, helping you build applications with clear domain knowledge, readability, maintainability, and scalability. It does not depend on any frameworks or ORMs and can be used in your application as needed.
+`@cdziv/devkit-ddd` helps you implement Domain-Driven Design (DDD) in your code, enabling the creation of applications with clear domain knowledge, readability, maintainability, and extensibility. It is framework-agnostic and does not rely on any ORM, allowing you to use it in your application as needed.
 
-> **Tip**: This documentation assumes you have a basic understanding of DDD. If you are not yet familiar with DDD or unsure whether to adopt it in your application, [Eric Evans' _Domain-Driven Design_](https://www.domainlanguage.com/ddd/) is a great starting point.
+> **Tip**: This document assumes you have a basic understanding of DDD. If you are unfamiliar with DDD or unsure whether to adopt it in your application, [Eric Evans’ _Domain-Driven Design_](https://www.domainlanguage.com/ddd/) is an excellent starting point.
 
 ## Quick Start
 
-In this section, we will use the core features of this library to implement a simple poker game example at the domain layer.
+In this section, we’ll walk through implementing a simple poker game example using the core features of this library at the domain layer.
 
 ### Installation
 
@@ -16,15 +18,15 @@ In this section, we will use the core features of this library to implement a si
 npm install @cdziv/devkit-ddd
 ```
 
-### Value Object
+### Value Objects
 
-First, a player needs a username and a chip stack. We will design the username as a value object:
+First, a player needs a username and a chip stack. We’ll design the username as a value object:
 
 ```ts
 // Create a value object with a DomainPrimitive value
 type UsernameValue = string;
 class Username extends ValueObject<UsernameValue> {
-  // Must implement the validation method
+  // Must implement the validate method
   validate(value: UsernameValue): ValidationResult {
     if (value.length < 3 || value.length > 30) {
       return false;
@@ -36,7 +38,7 @@ class Username extends ValueObject<UsernameValue> {
 expect(new Username('john_lennon').value).toBe('john_lennon');
 ```
 
-When instantiating with a valid value, the value can be accessed via the `value` property. If the provided value fails validation, an error will be thrown:
+When instantiated with a valid value, the value can be accessed via the `value` property. If the provided value fails validation, an error is thrown:
 
 ```ts
 const username = new Username('john_lennon');
@@ -46,7 +48,9 @@ const invalidName = '';
 expect(() => new Username(invalidName)).toThrow(ArgumentInvalidError);
 ```
 
-Next, we will design the chip stack as a value object. The chip stack has two properties: balance and bet. We use `ChipCount` for these properties' values, encapsulating the domain invariant logic within `ChipCount`, so we don’t need to worry about whether they are positive integers. Additionally, we define some behaviors using `evolve` to update their values:
+Next, we’ll design the chip stack as a value object. The chip stack has two properties: balance and bet. We use `ChipCount` for these properties’ values, encapsulating domain invariants in `ChipCount` so we don’t need to worry about whether they are positive integers. Additionally, we define behaviors using `evolve` to update their values:
+
+> **Tip**: The `evolve` method uses [Immer](https://immerjs.github.io/immer/) for updates, so you’ll see it accepts parameters like `(draft) => { draft.someProps = 'new value' }`. For value objects with a domain primitive value, you can directly pass the domain primitive value.
 
 ```ts
 type ChipCountValue = number;
@@ -59,8 +63,7 @@ class ChipCount extends ValueObject<ChipCountValue> {
     if (count.value > this.value) {
       throw new DddError('Not enough chips');
     }
-    // Another usage of evolve
-    return this.evolve((originalValue) => originalValue - count.value);
+    return this.evolve(this.value - count.value);
   }
 
   validate(value: ChipCountValue): ValidationResult {
@@ -80,24 +83,24 @@ class Stack extends ValueObject<StackValue> {
     if (this.value.balance.value < count.value) {
       throw new DddError('Not enough balance');
     }
-    // Another usage of evolve
-    return this.evolve((originalValue) => ({
-      balance: originalValue.balance.subtract(count),
-      bet: originalValue.bet.add(count),
-    }));
+    // Use a recipe function when the value is not a domain primitive
+    return this.evolve((draft) => {
+      draft.balance = this.value.balance.subtract(count);
+      draft.bet = this.value.bet.add(count);
+    });
   }
 
   win(count: ChipCount): Stack {
-    // Another usage of evolve
-    return this.evolve({
-      balance: this.value.balance.add(count),
-      bet: new ChipCount(0),
+    return this.evolve((draft) => {
+      draft.balance = this.value.balance.add(count);
+      draft.bet = new ChipCount(0);
     });
   }
 
   pay(): Stack {
-    // Another usage of evolve
-    return this.evolve('bet', new ChipCount(0));
+    return this.evolve((draft) => {
+      draft.bet = new ChipCount(0);
+    });
   }
 
   validate(value: StackValue): ValidationResult {
@@ -112,7 +115,7 @@ class Stack extends ValueObject<StackValue> {
 }
 ```
 
-Please note that this library designs all domain objects as immutable, so `evolve` returns a new value object instead of modifying the existing one. This ensures that domain objects always adhere to domain invariants, as the instantiation process calls the `validate` method. As long as you successfully create the object—whether through creation, persistence restoration, or via `evolve`—you must maintain its domain invariants, or an error should be thrown.
+Note that this library designs all domain objects as immutable, so `evolve` returns a new value object instead of modifying the existing one. This ensures domain objects always adhere to domain invariants, as the instantiation process invokes the `validate` method. Whether creating, restoring from persistence, or using `evolve`, you must maintain domain invariants, or an error should be thrown.
 
 You can use the `equals` method to compare whether two value objects have the same value:
 
@@ -123,11 +126,11 @@ expect(updatedChipCount).not.toBe(chipCount);
 expect(updatedChipCount.equals(chipCount)).toBe(true);
 ```
 
-### Entity / Aggregate Root
+### Entities/Aggregate Roots
 
-Now, it’s time to design the player object. A player has a unique identifier and should be designed as an entity rather than a value object. In a poker game, a player not only needs to maintain the domain invariants of its internal state but also perform actions like raising, calling, or waiting for external events to change its internal state, acting like a gateway. Therefore, we design it as an aggregate root.
+Now, it’s time to design the player object. A player has a unique identifier and should be designed as an entity, not a value object. In a poker game, a player must maintain domain invariants for its internal state, perform actions like raising or calling, and respond to external events by updating its state, acting like a gateway. Thus, we design it as an aggregate root.
 
-An aggregate root needs to define an ID:
+An aggregate root requires defining an ID:
 
 ```ts
 class UUID extends EntityId<string> {
@@ -152,7 +155,9 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
   }
 
   fold() {
-    return this.evolve('folded', true);
+    return this.evolve((draft) => {
+      draft.folded = true;
+    });
   }
 
   validate(props: PlayerProps): ValidationResult {
@@ -161,7 +166,7 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 }
 ```
 
-The properties of an entity/aggregate root can be accessed via `props`, while the `equals` method only compares whether the `id` is the same, without deeply comparing the properties.
+Access entity/aggregate root properties via `props`. The `equals` method only compares whether the `id` is the same, not the properties.
 
 ```ts
 const playerProps = {
@@ -177,15 +182,15 @@ const player = new Player(playerProps);
 
 const updatedPlayer = player.fold();
 
-expect(player).toEqual(playerProps);
+expect(player.props).toEqual(playerProps);
 expect(player.equals(updatedPlayer)).toBe(true);
 ```
 
-### Domain Event
+### Domain Events
 
-In the game, a player’s actions need to be received by other players to proceed with subsequent actions, so we define domain events:
+In the game, a player’s actions must be communicated to other players to enable subsequent actions, so we define domain events:
 
-> **Tip**: To make domain events easily transferable between services, such as through a message queue system, their properties should remain serializable. Therefore, we do not directly pass a value object as the aggregate root ID but instead use a plain string.
+> **Tip**: To ensure domain events can be easily passed between services, such as through a message queue system, their properties should remain serializable. Thus, we pass a plain string instead of a value object as the aggregate root ID.
 
 ```ts
 class PlayerFolded extends DomainEvent {}
@@ -204,7 +209,7 @@ class PlayerRaised extends DomainEvent<PlayerRaisedPayload> {
 }
 ```
 
-Next, we incorporate these events into the player’s behaviors:
+Next, incorporate them into player behaviors:
 
 ```ts
 class Player extends AggregateRoot<PlayerProps, UUID> {
@@ -212,7 +217,9 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   fold() {
     const event = new PlayerFolded(this.id.rawId);
-    return this.evolve('folded', true).addEvent(event);
+    return this.evolve((draft) => {
+      draft.folded = true;
+    }).addEvent(event);
   }
 
   check() {
@@ -222,24 +229,26 @@ class Player extends AggregateRoot<PlayerProps, UUID> {
 
   raise(count: ChipCount) {
     const event = new PlayerRaised(this.id.rawId, count.value);
-    return this.evolve('stack', this.props.stack.raise(count)).addEvent(event);
+    return this.evolve((draft) => {
+      draft.stack = this.props.stack.raise(count);
+    }).addEvent(event);
   }
 
   // ... Implementation details ...
 }
 ```
 
-When domain events are created alongside aggregate root behaviors, they are collected within the aggregate root. Once the behavior is confirmed to have occurred—e.g., after successful persistence—the aggregate root can publish the collected domain events to the event system:
+When domain events are created alongside aggregate root behaviors and are “confirmed” (e.g., successfully persisted), the aggregate root can publish its collected domain events to the event system:
 
 ```ts
 const playerProps = {
-  // ... Property implementation ...
+  // ... Implementation properties ...
 };
 let player = new Player(playerProps);
 player = player.fold();
 player.events; // [PlayerFolded]
 
-// Persist the state
+// Persist state
 await playerRepository.save(player);
 // Publish domain events
 player.publishEvents(eventEmitter);
@@ -247,9 +256,9 @@ player.publishEvents(eventEmitter);
 
 ### toJSON Method
 
-Whether for data persistence, remote calls, or responding to clients, domain objects often need to be converted into a serializable format. The `toJSON` method recursively converts values/properties into a JSON object:
+For data persistence, remote calls, or responding to clients, domain objects often need to be converted to a serializable format. The `toJSON` method recursively converts values/properties into a JSON object:
 
-> **Tip**: You should avoid directly exposing domain models to external applications. Instead, convert them into Data Transfer Objects (DTOs) or View Models.
+> **Tip**: Avoid exposing domain models directly to external applications. Instead, convert them to Data Transfer Objects (DTOs) or View Models.
 
 ```ts
 const playerProps = {

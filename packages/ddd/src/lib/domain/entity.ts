@@ -70,11 +70,14 @@ export abstract class Entity<
  * The definition method of `Record` makes it impossible to use `interface` as its constraint object,
  * so `type` must be used instead. If a better solution is found, this part should be revised.
  */
-export type EntityProps = Record<
-  string,
-  | DomainPrimitive
-  | DomainPrimitive[]
-  | DomainPrimitiveObject
-  | ValueObject<any>
-  | Entity<any>
->;
+export interface EntityProps {
+  [key: string]:
+    | DomainPrimitive
+    | DomainPrimitive[]
+    | DomainPrimitiveObject
+    | ValueObject<any>
+    | ValueObject<any>[]
+    | Entity<any>
+    | Entity<any>[]
+    | EntityProps;
+}

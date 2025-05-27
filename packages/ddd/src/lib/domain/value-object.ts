@@ -99,7 +99,7 @@ export abstract class ValueObject<
  * so `type` must be used instead. If a better solution is found, this part should be revised.
  */
 export type ValueObjectValue = DomainPrimitive | ValueObjectValueObject;
-interface ValueObjectValueObject {
+export interface ValueObjectValueObject {
   [key: string]:
     | DomainPrimitive
     | DomainPrimitive[]

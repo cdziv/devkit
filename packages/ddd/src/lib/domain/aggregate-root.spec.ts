@@ -59,6 +59,25 @@ describe('AggregateRoot', () => {
       expect(aggregate).toBeInstanceOf(TestAggregate);
       expect(aggregate.events).toEqual(events);
     });
+
+    it('should create an instance with another aggregate props and events', () => {
+      const events = [
+        new TestDomainEvent('aggregate-id'),
+        new TestDomainEvent('aggregate-id'),
+      ];
+      const aggregate = new TestAggregate(
+        {
+          name: 'foo',
+          age: 123,
+        },
+        events
+      );
+      const aggregate2 = new TestAggregate(aggregate.props, aggregate.events);
+
+      expect(aggregate2).toBeInstanceOf(TestAggregate);
+      expect(aggregate2.props).toEqual(aggregate.props);
+      expect(aggregate2.events).toEqual(aggregate.events);
+    });
   });
 
   describe('evolve', () => {

@@ -3,7 +3,7 @@ import { DomainObject, ReadonlyDomainObjectProps } from './domain-object';
 import { ValueObjectValue } from './value-object';
 import { DomainEvent } from './domain-event';
 import { EntityId } from './entity-id';
-import { Constructor } from 'type-fest';
+import { Constructor, ReadonlyDeep } from 'type-fest';
 import { Entity, EntityProps } from './entity';
 import { produce, WritableDraft } from 'immer';
 
@@ -12,11 +12,23 @@ export abstract class AggregateRoot<
   ID extends EntityId<ValueObjectValue> = EntityId<string>,
   J extends JsonValue = JsonifyDeep<T>
 > extends Entity<T, ID, J> {
-  private cachedEvents: ReadonlyDomainObjectProps<DomainEvent[]>;
+  private cachedEvents: readonly ReadonlyDomainObjectProps<DomainEvent<any>>[];
 
-  constructor(props: T, events?: DomainEvent[]) {
+  constructor(props: T, events?: DomainEvent<any>[]);
+  constructor(
+    props: T,
+    events?: readonly ReadonlyDomainObjectProps<DomainEvent<any>>[]
+  );
+  constructor(
+    props: T,
+    events?:
+      | DomainEvent<any>[]
+      | readonly ReadonlyDomainObjectProps<DomainEvent<any>>[]
+  ) {
     super(props);
-    this.cachedEvents = DomainObject.convertPropsToReadonly(events ?? []);
+    this.cachedEvents = Object.freeze(
+      events?.map((evt) => DomainObject.convertPropsToReadonly(evt)) ?? []
+    );
   }
 
   override evolve<R extends (draft: WritableDraft<T>) => void>(
@@ -44,7 +56,7 @@ export abstract class AggregateRoot<
     return new (this.constructor as Constructor<this>)(this.props);
   }
 
-  get events(): ReadonlyDomainObjectProps<DomainEvent[]> {
+  get events(): ReadonlyDeep<DomainEvent<any>[]> {
     return this.cachedEvents;
   }
 }

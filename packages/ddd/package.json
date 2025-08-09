@@ -16,7 +16,8 @@
   },
   "files": [
     "dist",
-    "!**/*.tsbuildinfo"
+    "!**/*.tsbuildinfo",
+    "!dist/package.json"
   ],
   "dependencies": {
     "@cdziv/devkit-error": "0.1.6",
